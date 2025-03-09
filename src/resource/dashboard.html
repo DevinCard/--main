@@ -93,6 +93,29 @@
         .error-message {
             color: #e74c3c;
         }
+
+        /* Add this to the existing styles */
+        .see-all-button {
+            display: block;
+            margin: 15px auto 5px;
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        .see-all-button:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .see-all-button:active {
+            transform: translateY(0);
+        }
     </style>
   </head>
   <body>
@@ -114,6 +137,7 @@
         <li><a href="../resource/goals.html">Goals</a></li>
         <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
         <li><a href="../resource/Categories.html">Categories</a></li>
+        <li><a href="../resource/faq.html">FAQ</a></li>
       </ul>
     </div>
 
@@ -139,11 +163,12 @@
           <h2 class="section-title">Categories</h2>
           <div id="category-rankings"></div>
           <div class="timeframe-controls">
-            <button class="time-btn active" data-timeframe="day">Today</button>
-            <button class="time-btn" data-timeframe="week">This Week</button>
-            <button class="time-btn" data-timeframe="month">This Month</button>
-            <button class="time-btn" data-timeframe="3month">3 Months</button>
-            <button class="time-btn" data-timeframe="ytd">YTD</button>
+            <button class="time-btn" data-timeframe="Daily">Daily</button>
+            <button class="time-btn" data-timeframe="Weekly">Weekly</button>
+            <button class="time-btn active" data-timeframe="Monthly">Monthly</button>
+            <button class="time-btn" data-timeframe="3M">3 Months</button>
+            <button class="time-btn" data-timeframe="6M">6 Months</button>
+            <button class="time-btn" data-timeframe="YTD">YTD</button>
           </div>
         </div>
       </div>

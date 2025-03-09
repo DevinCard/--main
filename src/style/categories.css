@@ -133,18 +133,22 @@ body {
 }
 
 .box-content {
+    background-color: #78a864;
+    border-radius: 10px;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
     height: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 .box-title {
-    font-size: 20px;
     color: white;
+    font-size: 20px;
+    font-weight: 600;
     margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .content-container {
@@ -162,8 +166,8 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: auto;
-    align-self: center;
+    display: block;
+    margin: 20px auto 10px;
     transition: background-color 0.2s;
     font-weight: 600;
 }
@@ -188,7 +192,6 @@ body {
 .rank-info {
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .rank-number {
@@ -198,12 +201,17 @@ body {
     text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
+.category-emoji {
+    margin-right: 10px;
+}
+
 .rank-change {
     font-size: 12px;
     padding: 3px 5px;
     border-radius: 3px;
     background-color: rgba(255, 255, 255, 0.3);
     font-weight: bold;
+    margin-left: 5px;
 }
 
 .rank-change.up {
@@ -230,34 +238,53 @@ body {
     text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Timeframe Controls */
+/* Timeframe Controls - white rounded buttons on green */
 .timeframe-controls {
     display: flex;
     justify-content: center;
     gap: 5px;
-    margin-top: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
 }
 
 .time-btn {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: white;
     border: none;
     padding: 8px 12px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s;
-    color: white;
+    font-size: 14px;
+    color: #78a864;
     font-weight: 600;
+    transition: all 0.2s;
 }
 
 .time-btn:hover {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
 .time-btn.active {
-    background-color: white;
-    color: #78a864;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #78a864;
+    color: white;
+    border: 2px solid white;
+}
+
+/* Info messages and no data messages */
+.info-message, .no-data-message, .error-message {
+    text-align: center;
+    padding: 20px;
+    color: white;
+    border-radius: 8px;
+}
+
+/* Loading message */
+.loading-message {
+    color: #666;
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
 }
 
 /* Category Spend Box Styles */
@@ -359,10 +386,12 @@ body {
 
 /* Info and error messages */
 .info-message, .error-message {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px 15px;
     text-align: center;
-    padding: 20px;
-    color: white;
-    border-radius: 8px;
+    margin: 10px 0;
 }
 
 .info-message {
@@ -419,12 +448,6 @@ body {
 .category-count {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.8);
-}
-
-.no-data-message {
-    color: rgba(255, 255, 255, 0.7);
-    text-align: center;
-    padding: 20px;
 }
 
 /* Modal Styles */
@@ -544,67 +567,78 @@ input, select {
 
 /* Category Budget Items */
 .category-budget-item {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.category-budget-item:hover {
     background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
 }
 
-.budget-info {
+.budget-category {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    align-items: center;
+    width: 60%;
 }
 
-.category-name {
-    font-weight: 600;
-    font-size: 1.1rem;
+.budget-category-emoji {
+    font-size: 24px;
+    margin-right: 12px;
+    min-width: 24px;
+    text-align: center;
     color: white;
 }
 
+.budget-category-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .budget-amount {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    width: 25%;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.budget-period {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: normal;
 }
 
 .budget-actions {
     display: flex;
     gap: 10px;
+    width: 15%;
+    justify-content: flex-end;
 }
 
-.edit-budget-btn, .delete-budget-btn {
-    padding: 6px 12px;
+.budget-actions button {
+    background-color: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s;
 }
 
 .edit-budget-btn {
-    background-color: rgba(255, 255, 255, 0.8);
-    color: #78a864;
-}
-
-.edit-budget-btn:hover {
-    background-color: white;
+    color: #333;
 }
 
 .delete-budget-btn {
-    background-color: rgba(255, 255, 255, 0.8);
     color: #e74c3c;
 }
 
-.delete-budget-btn:hover {
+.edit-budget-btn:hover, .delete-budget-btn:hover {
     background-color: white;
 }
 
@@ -711,431 +745,129 @@ input, select {
     margin-right: 3px;
 }
 
-/* Category spend section */
-.category-spend-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.category-spend-item {
-    display: flex;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.spend-circle-container {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    flex-shrink: 0;
-    margin-right: 12px;
-}
-
-.spend-circle {
-    width: 100%;
-    height: 100%;
-}
-
-.spend-circle svg {
-    width: 100%;
-    height: 100%;
-}
-
-.circle-bg {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.2);
-    stroke-width: 3.8;
-}
-
-.circle {
-    fill: none;
-    stroke-width: 3.8;
-    stroke-linecap: round;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-    transition: stroke-dasharray 0.8s ease;
-}
-
-svg .percentage {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.6rem;
-    text-anchor: middle;
-    font-weight: 600;
-    fill: white;
-}
-
-.spend-details {
-    flex-grow: 1;
-}
-
-.spend-details h3 {
-    margin: 0 0 5px 0;
-    font-size: 1rem;
-}
-
-.spend-amount {
-    margin: 0 0 5px 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.status-indicator {
-    margin: 0;
-    font-size: 0.8rem;
-    opacity: 0.9;
-    color: #e8f5e3;
-}
-
-/* Progress Ring */
-.progress-ring-circle {
-    transition: stroke-dashoffset 0.35s;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-}
-
-.progress-text-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.75rem;
-}
-
-.percentage {
-    font-weight: 600;
+/* Monthly budget tracking section */
+.spend-section-title {
     color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    text-align: center;
 }
 
-/* Category budget section */
-.budget-list {
-    margin-top: 20px;
+.spend-section-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
-.budget-item {
+/* Budget progress item styling */
+.budget-progress-item {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.budget-progress-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.budget-progress-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 12px 15px;
     margin-bottom: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.budget-category {
+.budget-progress-category {
     display: flex;
     align-items: center;
 }
 
-.budget-icon {
-    font-size: 20px;
+.budget-progress-emoji {
+    font-size: 22px;
     margin-right: 10px;
-}
-
-.budget-name {
-    font-weight: 500;
-}
-
-.budget-amount {
-    font-weight: 600;
-}
-
-.budget-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.budget-action-btn {
-    background-color: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 4px;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    color: white;
-}
-
-.budget-action-btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-}
-
-.add-budget-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 12px;
-    width: 100%;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 15px;
-}
-
-.add-budget-btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-}
-
-.add-budget-btn i {
-    margin-right: 8px;
-}
-
-/* Budget Modal */
-.budget-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    align-items: center;
-    justify-content: center;
-}
-
-.budget-modal-content {
-    background-color: white;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    padding: 25px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-.budget-modal-header {
-    margin-bottom: 20px;
-}
-
-.budget-modal-header h3 {
-    margin: 0;
-    color: #333;
-    font-size: 1.4rem;
-}
-
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 1.5rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #888;
-}
-
-.budget-form-group {
-    margin-bottom: 15px;
-}
-
-.budget-form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #555;
-}
-
-.budget-form-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-}
-
-.budget-form-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-    background-color: white;
-}
-
-.save-budget-btn {
-    background-color: #78a864;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 12px;
-    width: 100%;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 10px;
-}
-
-.save-budget-btn:hover {
-    background-color: #6a9757;
-}
-
-.delete-budget-btn {
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 12px;
-    width: 100%;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 10px;
-    display: none;
-}
-
-.delete-budget-btn:hover {
-    background-color: #e55c5c;
-}
-
-/* Timeframe controls */
-.timeframe-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.timeframe-btn {
-    background-color: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    border-radius: 6px;
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 0.9rem;
-}
-
-.timeframe-btn:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-}
-
-.timeframe-btn.active {
-    background-color: rgba(255, 255, 255, 0.3);
-    font-weight: 500;
-}
-
-/* Toast notifications */
-.toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-}
-
-.toast {
-    background-color: #333;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    font-size: 0.9rem;
-    min-width: 250px;
-    max-width: 350px;
-    opacity: 0;
-    transform: translateY(-20px);
-    animation: slideIn 0.3s forwards, fadeOut 0.5s 2.5s forwards;
-}
-
-.toast.success {
-    background-color: #4caf50;
-}
-
-.toast.error {
-    background-color: #f44336;
-}
-
-.toast.warning {
-    background-color: #ff9800;
-}
-
-.toast-icon {
-    margin-right: 10px;
-    font-size: 1.2rem;
-}
-
-@keyframes slideIn {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeOut {
-    to {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-}
-
-/* Loading spinner */
-.loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.loading-spinner::after {
-    content: "";
-    width: 25px;
-    height: 25px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s linear infinite;
-    margin-left: 10px;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Info and error messages */
-.info-message, .error-message, .no-data-message {
+    min-width: 22px;
     text-align: center;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 15px 0;
 }
 
-.info-message {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
+.budget-progress-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
 }
 
-.error-message {
-    background-color: rgba(244, 67, 54, 0.2);
-    color: #ff8a80;
+.budget-progress-amount {
+    text-align: right;
 }
 
-.no-data-message {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-    font-style: italic;
+.budget-progress-spent {
+    font-weight: 700;
+    color: #4CAF50;
+}
+
+.warning .budget-progress-spent {
+    color: #FFA000;
+}
+
+.over-budget .budget-progress-spent {
+    color: #F44336;
+}
+
+.budget-progress-separator {
+    margin: 0 4px;
+    color: #999;
+}
+
+.budget-progress-total {
+    color: #666;
+}
+
+.budget-progress-bar-container {
+    position: relative;
+    height: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.budget-progress-bar {
+    height: 100%;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+.warning .budget-progress-bar {
+    background-color: #FFA000;
+}
+
+.over-budget .budget-progress-bar {
+    background-color: #F44336;
+}
+
+.budget-progress-percentage {
+    position: absolute;
+    right: 5px;
+    top: -20px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Remove no longer needed styles */
+.category-spend-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
 }
 
 /* Responsive adjustments */
@@ -1157,11 +889,13 @@ svg .percentage {
 
 /* Status indicator styles */
 .status-indicator {
-    font-size: 0.8rem;
+    font-size: 13px;
     padding: 3px 8px;
     border-radius: 4px;
-    margin-top: 5px;
+    margin-top: 3px;
     display: inline-block;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .status-good {
@@ -1174,4 +908,201 @@ svg .percentage {
 
 .status-over {
     background-color: rgba(255, 87, 34, 0.3);
+}
+
+.spend-item {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.spend-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.spend-item.warning {
+    border-left-color: #FFC107;
+}
+
+.spend-item.over-budget {
+    border-left-color: #FF5252;
+}
+
+.spend-item-link {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    align-items: center;
+}
+
+.category-progress {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    margin-right: 15px;
+}
+
+.progress-ring {
+    width: 100%;
+    height: 100%;
+}
+
+.progress-ring-circle-bg {
+    stroke: rgba(255, 255, 255, 0.2);
+}
+
+.progress-ring-circle {
+    stroke-width: 5;
+    fill: transparent;
+    stroke-linecap: round;
+    transform-origin: center;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.category-emoji {
+    position: absolute;
+    font-size: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -65%);
+    z-index: 2;
+    color: white;
+}
+
+.progress-text {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    bottom: 12px;
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+
+.category-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.category-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: white;
+}
+
+.spend-amount {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Status colors for progress rings */
+.on-track .progress-ring-circle {
+    stroke: white;
+}
+
+.on-track .status-indicator {
+    background-color: rgba(120, 168, 100, 0.15);
+    color: #3d6d24;
+}
+
+.warning .progress-ring-circle {
+    stroke: #FFC107;
+}
+
+.warning .status-indicator {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #b26a00;
+}
+
+.over-budget .progress-ring-circle {
+    stroke: #FF5252;
+}
+
+.over-budget .status-indicator {
+    background-color: rgba(255, 82, 82, 0.15);
+    color: #d32f2f;
+}
+
+/* Info message styling */
+.info-message {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 15px 0;
+    text-align: center;
+    border-left: 4px solid #1565C0;
+}
+
+.no-budgets-message {
+    background-color: #f3f9ff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin: 15px 0;
+}
+
+.no-budgets-message p {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+#create-first-budget {
+    background-color: white;
+    color: #78a864;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+/* Projection styling */
+.projection {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.3);
+    border-width: 1px;
+}
+
+.projection-badge {
+    display: inline-block;
+    font-size: 11px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.projection .progress-ring-circle {
+    stroke-dasharray: 5, 5;
+}
+
+.monthly-reference {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 2px;
+}
+
+/* Period note styling */
+.period-note {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: normal;
+    margin-left: 4px;
 }

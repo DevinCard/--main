@@ -117,23 +117,32 @@ async function updateCategoryDisplay(timeframe, sortBy = 'amount') {
 function getPreviousPeriod(timeframe) {
   const now = new Date();
   switch(timeframe) {
+    case 'Daily':
     case 'day':
       now.setDate(now.getDate() - 1);
-      return 'day';
+      return 'Daily';
+    case 'Weekly':
     case 'week':
       now.setDate(now.getDate() - 7);
-      return 'week';
+      return 'Weekly';
+    case 'Monthly':
     case 'month':
       now.setMonth(now.getMonth() - 1);
-      return 'month';
+      return 'Monthly';
+    case '3M':
     case '3month':
       now.setMonth(now.getMonth() - 3);
-      return '3month';
+      return '3M';
+    case '6M':
+      now.setMonth(now.getMonth() - 6);
+      return '6M';
+    case 'YTD':
     case 'ytd':
+      // For YTD, previous period is the same period last year
       now.setFullYear(now.getFullYear() - 1);
-      return 'ytd';
+      return 'YTD';
     default:
-      return timeframe;
+      return timeframe; // Return same timeframe if unknown
   }
 }
 
@@ -144,19 +153,28 @@ function getCategoryRankings(transactions, timeframe) {
   const filteredTransactions = transactions.filter(t => {
     const transDate = new Date(t.date);
     switch(timeframe) {
+      case 'Daily':
       case 'day':
         return transDate.toDateString() === now.toDateString();
+      case 'Weekly':
       case 'week':
         const weekAgo = new Date(now);
         weekAgo.setDate(now.getDate() - 7);
         return transDate >= weekAgo;
+      case 'Monthly':
       case 'month':
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         return transDate >= monthStart;
+      case '3M':
       case '3month':
         const threeMonthsAgo = new Date(now);
         threeMonthsAgo.setMonth(now.getMonth() - 3);
         return transDate >= threeMonthsAgo;
+      case '6M':
+        const sixMonthsAgo = new Date(now);
+        sixMonthsAgo.setMonth(now.getMonth() - 6);
+        return transDate >= sixMonthsAgo;
+      case 'YTD':
       case 'ytd':
         const yearStart = new Date(now.getFullYear(), 0, 1);
         return transDate >= yearStart;
@@ -165,15 +183,12 @@ function getCategoryRankings(transactions, timeframe) {
     }
   });
 
-  console.log('Filtered transactions:', filteredTransactions);
-
+  // Only consider withdrawal (expense) transactions for category spending
   const categorySpending = {};
   filteredTransactions.forEach(t => {
-    let category = extractCategoryName(t.category);
     if (t.type === 'Withdrawal') {
-      categorySpending[category] = (categorySpending[category] || 0) + t.amount;
-    } else if (t.type === 'Deposit') {
-      categorySpending[category] = (categorySpending[category] || 0) + t.amount;
+      const category = extractCategoryName(t.category);
+      categorySpending[category] = (categorySpending[category] || 0) + parseFloat(t.amount);
     }
   });
 
@@ -181,7 +196,6 @@ function getCategoryRankings(transactions, timeframe) {
     .map(([category, amount]) => ({ category, amount }))
     .sort((a, b) => b.amount - a.amount);
 
-  console.log('Rankings:', rankings);
   return rankings;
 }
 
@@ -375,31 +389,195 @@ async function loadUpcomingRecurringTransactions() {
         }
         
         // Show loading state
-        container.innerHTML = '<div class="loading">Loading recurring payments...</div>';
+        container.innerHTML = '<div class="loading-message">Loading recurring payments...</div>';
         
-        // Fetch recurring payments from the API
-        const recurringPayments = await window.api.getRecurringPayments();
+        // Load both regular recurring payments and goal recurring deposits
+        console.log('Fetching recurring payments and goals...');
+        const [recurringPayments, goals] = await Promise.all([
+            window.api.getRecurringPayments().catch(err => {
+                console.error('Error fetching recurring payments:', err);
+                return [];
+            }),
+            window.api.getGoals().catch(err => {
+                console.error('Error fetching goals:', err);
+                return [];
+            })
+        ]);
         
-        // If no recurring payments, show a message
-        if (!recurringPayments || recurringPayments.length === 0) {
+        console.log('Recurring payments:', recurringPayments);
+        console.log('Goals:', goals);
+        
+        // Extract recurring deposits from goals
+        const recurringDeposits = [];
+        if (Array.isArray(goals)) {
+            goals.forEach(goal => {
+                if (goal.recurring && Array.isArray(goal.recurring) && goal.recurring.length > 0) {
+                    console.log(`Found ${goal.recurring.length} recurring deposits for goal: ${goal.title}`);
+                    goal.recurring.forEach(deposit => {
+                        // Add goal information to each deposit
+                        recurringDeposits.push({
+                            ...deposit,
+                            goal_id: goal.id,
+                            goal_title: goal.title,
+                            description: `Goal: ${goal.title}`,
+                            isGoalDeposit: true,
+                            type: 'expense' // Goal deposits are expenses
+                        });
+                    });
+                }
+            });
+        }
+        
+        console.log('Recurring deposits from goals:', recurringDeposits);
+        
+        // Get transactions that are marked as recurring but not in the recurring payments list
+        const transactions = await window.api.getTransactions().catch(err => {
+            console.error('Error fetching transactions:', err);
+            return [];
+        });
+        
+        // Find transactions that are recurring but not in the recurring payments list
+        const recurringTransactions = transactions.filter(transaction => {
+            // Check if transaction is marked as recurring (any value other than 'one-time')
+            return transaction.recurring && transaction.recurring !== 'one-time';
+        });
+        
+        console.log('Recurring transactions found:', recurringTransactions);
+        
+        // Convert recurring transactions to recurring payment format
+        const additionalRecurringPayments = recurringTransactions.map(transaction => {
+            return {
+                id: transaction.id,
+                title: transaction.title,
+                description: transaction.title,
+                amount: transaction.amount,
+                frequency: transaction.recurring || 'monthly', // Default to monthly if not specified
+                category: transaction.category,
+                type: transaction.type,
+                last_payment_date: transaction.date,
+                // Ensure recurring payments are treated as indefinite
+                end_date: null, // No end date means indefinite
+                status: 'active'
+            };
+        });
+        
+        // Combine all recurring items, ensuring no duplicates by ID
+        const allRecurringItems = [
+            ...(Array.isArray(recurringPayments) ? recurringPayments : []), 
+            ...recurringDeposits,
+            ...additionalRecurringPayments
+        ];
+        
+        // Remove duplicates based on ID
+        const uniqueRecurringItems = [];
+        const seenIds = new Set();
+        
+        allRecurringItems.forEach(item => {
+            if (!item.id || !seenIds.has(item.id)) {
+                if (item.id) {
+                    seenIds.add(item.id);
+                }
+                uniqueRecurringItems.push(item);
+            }
+        });
+        
+        console.log('All recurring items combined (unique):', uniqueRecurringItems);
+        
+        // If no recurring items, show a message
+        if (!uniqueRecurringItems || uniqueRecurringItems.length === 0) {
             container.innerHTML = '<p class="no-data-message">No recurring payments scheduled.</p>';
             return;
         }
         
+        // Process each recurring item to add next payment date
+        const itemsWithNextDates = uniqueRecurringItems.map(item => {
+            const frequency = item.frequency || 'monthly';
+            let nextDate;
+            
+            // If there's already a next_payment_date, use it
+            if (item.next_payment_date) {
+                nextDate = new Date(item.next_payment_date);
+            } else {
+                // Calculate next payment date based on frequency and last payment
+                const today = new Date();
+                const lastPaymentDate = item.last_payment_date ? new Date(item.last_payment_date) : new Date();
+                
+                switch(frequency.toLowerCase()) {
+                    case 'daily':
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setDate(nextDate.getDate() + 1);
+                        break;
+                    case 'weekly':
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setDate(nextDate.getDate() + 7);
+                        break;
+                    case 'biweekly':
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setDate(nextDate.getDate() + 14);
+                        break;
+                    case 'monthly':
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setMonth(nextDate.getMonth() + 1);
+                        break;
+                    case 'quarterly':
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setMonth(nextDate.getMonth() + 3);
+                        break;
+                    case 'yearly':
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setFullYear(nextDate.getFullYear() + 1);
+                        break;
+                    default:
+                        nextDate = new Date(lastPaymentDate);
+                        nextDate.setMonth(nextDate.getMonth() + 1); // Default to monthly
+                }
+                
+                // Ensure next date is in the future
+                if (nextDate < today) {
+                    while (nextDate < today) {
+                        // Move to next period until we find a future date
+                        switch(frequency.toLowerCase()) {
+                            case 'daily':
+                                nextDate.setDate(nextDate.getDate() + 1);
+                                break;
+                            case 'weekly':
+                                nextDate.setDate(nextDate.getDate() + 7);
+                                break;
+                            case 'biweekly':
+                                nextDate.setDate(nextDate.getDate() + 14);
+                                break;
+                            case 'monthly':
+                                nextDate.setMonth(nextDate.getMonth() + 1);
+                                break;
+                            case 'quarterly':
+                                nextDate.setMonth(nextDate.getMonth() + 3);
+                                break;
+                            case 'yearly':
+                                nextDate.setFullYear(nextDate.getFullYear() + 1);
+                                break;
+                        }
+                    }
+                }
+            }
+            
+            return {
+                ...item,
+                next_payment_date: nextDate
+            };
+        });
+        
+        // Sort by next payment date
+        itemsWithNextDates.sort((a, b) => {
+            return a.next_payment_date - b.next_payment_date;
+        });
+        
         // Clear the container
         container.innerHTML = '';
         
-        // Sort by next payment date
-        recurringPayments.sort((a, b) => {
-            const dateA = new Date(a.next_payment_date);
-            const dateB = new Date(b.next_payment_date);
-            return dateA - dateB;
-        });
-        
-        // Create elements for each recurring payment
-        recurringPayments.forEach(payment => {
+        // Display ALL upcoming recurring payments
+        itemsWithNextDates.forEach(payment => {
             // Format next payment date
-            const nextPaymentDate = new Date(payment.next_payment_date);
+            const nextPaymentDate = payment.next_payment_date;
             const formattedDate = nextPaymentDate.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -408,6 +586,7 @@ async function loadUpcomingRecurringTransactions() {
             
             // Calculate days until payment
             const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to start of day
             const daysUntil = Math.ceil((nextPaymentDate - today) / (1000 * 60 * 60 * 24));
             
             // Create payment element
@@ -422,16 +601,21 @@ async function loadUpcomingRecurringTransactions() {
             }
             
             // Format the payment description
-            let description = payment.description || 'Payment';
-            if (payment.goal_title) {
+            let description = payment.description || payment.title || 'Payment';
+            let type = 'Purchase';
+            
+            if (payment.isGoalDeposit) {
                 description = `Goal: ${payment.goal_title}`;
+                type = 'Deposit';
+            } else if (payment.type === 'Deposit') {
+                type = 'Deposit';
             }
             
             // Set inner HTML with payment details
             paymentElement.innerHTML = `
                 <div class="payment-details">
                     <div class="payment-title">${description}</div>
-                    <div class="payment-frequency">${payment.frequency}</div>
+                    <div class="payment-frequency">${payment.frequency} ${type}</div>
                 </div>
                 <div class="payment-amount">$${parseFloat(payment.amount).toFixed(2)}</div>
                 <div class="payment-date">

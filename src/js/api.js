@@ -218,8 +218,78 @@ const api = {
                 throw new Error('Authentication required');
             }
             
-            // Make the DELETE request to the correct endpoint
-            const response = await fetch(`${API_BASE_URL}/goals/${goalId}`, {
+            // IMPORTANT: We need to find the contributions by checking transactions directly
+            // The goal's current_amount may not accurately reflect all contributions
+            console.log('Finding contributions for goal ID:', goalId);
+            
+            // Step 1: Get all transactions related to this goal
+            let totalContributed = 0;
+            let goalTitle = 'Unknown Goal';
+            let foundContributions = false;
+            
+            try {
+                // Get all transactions
+                const transactionsResponse = await fetch(`${API_BASE_URL}/transactions`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (transactionsResponse.ok) {
+                    const allTransactions = await transactionsResponse.json();
+                    
+                    // Filter for transactions related to this goal
+                    // Look for both withdrawals (contributions) and corresponding goal transactions
+                    console.log(`Searching through ${allTransactions.length} transactions for goal contributions...`);
+                    
+                    allTransactions.forEach(transaction => {
+                        // Check for direct goal contributions (withdrawals from main balance)
+                        if (transaction.type === 'Withdrawal' && 
+                            transaction.title && 
+                            transaction.title.includes('Goal Contribution')) {
+                            
+                            // Check if this transaction is for our specific goal
+                            // We might need to check description or other fields depending on how they're stored
+                            const goalIdRegex = new RegExp(`goal_id:${goalId}`, 'i');
+                            const isForThisGoal = transaction.description && goalIdRegex.test(transaction.description);
+                            
+                            if (isForThisGoal || transaction.goal_id === goalId) {
+                                // This is a contribution to our target goal
+                                const amount = parseFloat(transaction.amount) || 0;
+                                totalContributed += amount;
+                                foundContributions = true;
+                                
+                                console.log(`Found contribution: $${amount}`);
+                                
+                                // Try to extract goal title if available
+                                if (!goalTitle || goalTitle === 'Unknown Goal') {
+                                    // Extract from transaction title or description
+                                    const titleFromDesc = transaction.description && transaction.description.match(/for goal: (.*?)($|\s*\()/i);
+                                    if (titleFromDesc && titleFromDesc[1]) {
+                                        goalTitle = titleFromDesc[1].trim();
+                                    } else if (transaction.title) {
+                                        const titleFromTitle = transaction.title.match(/Goal Contribution - (.*?)($|\s*\()/i);
+                                        if (titleFromTitle && titleFromTitle[1]) {
+                                            goalTitle = titleFromTitle[1].trim();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    console.log(`Total contributions found: $${totalContributed} for goal: ${goalTitle}`);
+                } else {
+                    console.warn('Failed to fetch transactions to check for goal contributions');
+                }
+            } catch (error) {
+                console.error('Error fetching transactions for goal contributions:', error);
+                // Continue with deletion even if we can't find transactions
+            }
+            
+            // Step 2: Now proceed with deleting the goal
+            const deleteResponse = await fetch(`${API_BASE_URL}/goals/${goalId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -227,24 +297,68 @@ const api = {
                 }
             });
             
-            // Log response status for debugging
-            console.log('Delete goal response status:', response.status);
-            
-            // Parse response
+            // Parse delete response
             let data;
             try {
-                data = await response.json();
+                data = await deleteResponse.json();
             } catch (e) {
-                // If JSON parsing fails, return a simplified object
-                data = { success: response.ok };
+                // If JSON parsing fails, create a basic response object
+                data = { success: deleteResponse.ok };
             }
             
-            // Handle errors
-            if (!response.ok) {
+            // Handle delete errors
+            if (!deleteResponse.ok) {
                 throw new Error(data.error || 'Failed to delete goal');
             }
             
-            // Return successful response
+            console.log('Goal deleted successfully');
+            
+            // Step 3: Create a refund transaction if we found contributions
+            if (totalContributed > 0) {
+                console.log(`Creating refund for $${totalContributed} for goal "${goalTitle}"`);
+                
+                try {
+                    // Create the refund transaction
+                    const refundTransaction = {
+                        type: 'Deposit',
+                        title: `Goal Refund`,
+                        amount: totalContributed,
+                        category: 'Refund|💰',
+                        date: new Date().toISOString(),
+                        description: `Refund from deleted goal: ${goalTitle}`
+                    };
+                    
+                    console.log('Refund transaction details:', refundTransaction);
+                    
+                    // Create the refund transaction
+                    const refundResponse = await fetch(`${API_BASE_URL}/transactions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(refundTransaction)
+                    });
+                    
+                    if (refundResponse.ok) {
+                        console.log('Refund transaction created successfully');
+                        const refundData = await refundResponse.json();
+                        
+                        // Add refund info to the response data
+                        data.refundAmount = totalContributed;
+                        data.refundTransaction = refundData;
+                    } else {
+                        console.error('Failed to create refund transaction:', 
+                                     await refundResponse.text().catch(() => 'Unknown error'));
+                    }
+                } catch (refundError) {
+                    console.error('Error creating refund transaction:', refundError);
+                }
+            } else {
+                console.log('No refund created - could not find contributions for this goal');
+            }
+            
+            // Return the response data (including refund info if applicable)
             return data;
         } catch (error) {
             console.error('Error deleting goal:', error);
@@ -418,7 +532,44 @@ const api = {
             }
             
             const data = await response.json();
-            return data.payments || [];
+            
+            // Also fetch all transactions to check for recurring ones
+            const transactions = await this.getTransactions();
+            
+            // Find recurring transactions that might not be in the recurring payments list
+            const recurringTransactions = transactions.filter(transaction => {
+                return transaction.recurring && transaction.recurring !== 'one-time';
+            });
+            
+            // Convert recurring transactions to recurring payment format
+            const additionalRecurringPayments = recurringTransactions.map(transaction => {
+                return {
+                    id: transaction.id,
+                    title: transaction.title,
+                    description: transaction.title,
+                    amount: transaction.amount,
+                    frequency: transaction.recurring || 'monthly', 
+                    category: transaction.category,
+                    type: transaction.type,
+                    last_payment_date: transaction.date,
+                    // Ensure recurring payments are treated as indefinite
+                    end_date: null, // No end date means indefinite
+                    status: 'active'
+                };
+            });
+            
+            // Merge both arrays, ensuring no duplicates
+            const allRecurringPayments = [...(data.payments || [])];
+            
+            // Add in any recurring transactions not already in the payments array
+            additionalRecurringPayments.forEach(payment => {
+                const exists = allRecurringPayments.some(p => p.id === payment.id);
+                if (!exists) {
+                    allRecurringPayments.push(payment);
+                }
+            });
+            
+            return allRecurringPayments;
         } catch (error) {
             console.error('Error fetching recurring payments:', error);
             throw error;

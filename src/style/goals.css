@@ -210,24 +210,47 @@ body {
     text-align: center;
 }
 
-/* Container styles */
+/* Goals container - make it horizontal with scrolling */
 .goals-container {
-    position: relative;
-    width: 100%;
-    padding: 20px 0;
-}
-
-.goals-wrapper {
-    overflow-x: hidden;
-    width: 100%;
-    position: relative;
-}
-
-.goals-scroll {
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 20px;
-    padding: 0 20px;
-    transition: transform 0.3s ease;
+    overflow-x: auto;
+    padding: 10px 0 20px;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure goal cards have fixed width for consistency */
+.goal-card {
+    min-width: 280px;
+    max-width: 320px;
+    flex: 0 0 auto;
+    margin-bottom: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Style scrollbar for better appearance */
+.goals-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.goals-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.goals-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+.goals-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.7);
 }
 
 /* Scroll buttons */
@@ -261,30 +284,6 @@ body {
 }
 
 /* Goal card styles */
-.goal-card {
-    flex: 0 0 300px; /* Fixed width, no growing or shrinking */
-    max-width: 300px;
-    margin: 0;
-    opacity: 1;
-    transition: all 0.3s ease;
-}
-
-/* Animations */
-@keyframes fadeOut {
-    from { opacity: 1; transform: scale(1); }
-    to { opacity: 0; transform: scale(0.8); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.goal-card.new {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Goal Card Styles */
 .goal-card {
     background: white;
     border-radius: 15px;

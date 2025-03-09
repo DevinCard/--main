@@ -1,6 +1,3 @@
-// Store category budgets in memory (in a real app, these would be stored in a database)
-window.categoryBudgets = [];
-
 document.addEventListener("DOMContentLoaded", async () => {
   console.log('Categories page is loading...');
   
@@ -23,18 +20,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log('Loading category data...');
     await Promise.all([
       loadCategories(),
-      loadTopCategories('day'), // Default to Today for top categories
+      loadTopCategories('day'),
       loadCategoryBudgets(),
-      loadCategorySpend('month'), // Default to Month for budget spend
+      loadCategorySpend(),
       loadActiveCategories()
     ]);
     console.log('All category data loaded successfully');
     
     // Set up timeframe buttons after data is loaded
     setupTimeframeButtons();
-    
-    // Apply the correct active state for each section's timeframe buttons
-    updateTimeframeControls('day', 'timeframe-controls'); // Top Categories section
+
+    // Setup timeframe controls for current spend
+    setupSpendTimeframeControls();
   } catch (error) {
     console.error('Error initializing Categories page:', error);
     showToast('Failed to load some data', 'error');
@@ -124,7 +121,7 @@ function getCategoryRankings(transactions, timeframe) {
       case 'month':
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         return transDate >= monthStart;
-      case '3m':
+      case '3month':
         const threeMonthsAgo = new Date(now);
         threeMonthsAgo.setMonth(now.getMonth() - 3);
         return transDate >= threeMonthsAgo;
@@ -141,7 +138,7 @@ function getCategoryRankings(transactions, timeframe) {
   filteredTransactions.forEach(t => {
     if (t.type === 'Withdrawal') {
       const category = extractCategoryName(t.category);
-      categorySpending[category] = (categorySpending[category] || 0) + Math.abs(parseFloat(t.amount));
+      categorySpending[category] = (categorySpending[category] || 0) + parseFloat(t.amount);
     }
   });
 
@@ -220,7 +217,7 @@ function updateRankings(newRankings, oldRankings) {
     return;
   }
   
-  newRankings.slice(0, 5).forEach((category, index) => {
+  newRankings.forEach((category, index) => {
     const rankItem = document.createElement('div');
     rankItem.className = 'ranking-item';
     
@@ -246,131 +243,72 @@ function updateRankings(newRankings, oldRankings) {
     
     // Format the category name (extract the emoji if present)
     let displayName = category.category;
-    let emoji = getCategoryEmoji(category.category);
+    let emoji = '';
     
-    if (emoji !== '📊') {
-      displayName = cleanCategoryName(category.category);
+    const match = category.category.match(/^(\p{Emoji})\s+(.*)/u);
+    if (match) {
+      emoji = match[1];
+      displayName = match[2];
     }
-    
-    // Format currency
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(category.amount);
     
     rankItem.innerHTML = `
       <div class="rank-info">
         <span class="rank-number">#${index + 1}</span>
-        <span class="category-emoji">${emoji}</span>
+        ${emoji ? `<span class="category-emoji" style="margin-right: 5px;">${emoji}</span>` : ''}
         <span>${displayName}</span>
         ${rankChange ? `<span class="rank-change ${changeClass}">${rankChange}</span>` : ''}
       </div>
-      <span class="category-amount">${formattedAmount}</span>
+      <span class="category-amount">$${category.amount.toFixed(2)}</span>
     `;
     
     container.appendChild(rankItem);
   });
 }
 
-// Helper function to update timeframe buttons
-function updateTimeframeControls(selectedTimeframe, controlsClass = 'timeframe-controls') {
-    // Find all timeframe control containers
-    const controlContainers = document.querySelectorAll(`.${controlsClass}`);
-    if (!controlContainers.length) return;
-    
-    // Update all timeframe control sets
-    controlContainers.forEach(controls => {
-        const buttons = controls.querySelectorAll('.time-btn');
-        buttons.forEach(button => {
-            const timeframe = button.getAttribute('data-timeframe');
-            if (timeframe === selectedTimeframe) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-    });
-}
-
-// Setup function for timeframe buttons
+// Set up timeframe buttons event handlers
 function setupTimeframeButtons() {
-    const timeframeButtons = document.querySelectorAll('.time-btn');
-    timeframeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Find the parent timeframe-controls element
-            const controlsContainer = button.closest('.timeframe-controls');
-            if (!controlsContainer) return;
-            
-            // Remove active class from all buttons in this container
-            const siblingButtons = controlsContainer.querySelectorAll('.time-btn');
-            siblingButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to the clicked button
-            button.classList.add('active');
-            
-            // Get the timeframe value
-            const timeframe = button.getAttribute('data-timeframe');
-            
-            // Update appropriate section based on which container this is in
-            const parentBox = controlsContainer.closest('.category-box');
-            if (parentBox.classList.contains('top-right')) {
-                // This is the Top Categories section
-                loadTopCategories(timeframe);
-            } else if (parentBox.classList.contains('bottom-left')) {
-                // This is the Current Spend section
-                loadCategorySpend(timeframe);
-            }
-        });
+  const timeframeButtons = document.querySelectorAll('.time-btn');
+  timeframeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Remove active class from all buttons
+      timeframeButtons.forEach(btn => btn.classList.remove('active'));
+      // Add active class to the clicked button
+      button.classList.add('active');
+      // Update the top categories display with the new timeframe
+      loadTopCategories(button.getAttribute('data-timeframe'));
+      // Also update the category spend display
+      loadCategorySpend(button.getAttribute('data-timeframe'));
     });
+  });
 }
 
-// Load category budgets from localStorage
-async function loadCategoryBudgets(silentMode = false) {
-  try {
-    // Get budgets from localStorage
-    const budgetsStr = localStorage.getItem('categoryBudgets');
-    let budgets = [];
-    
-    if (budgetsStr) {
-      budgets = JSON.parse(budgetsStr);
-    }
-    
-    // Save to global variable for other functions to access
-    window.categoryBudgets = budgets;
-    
-    // If in silent mode, just return the budgets without updating UI
-    if (silentMode) {
-      return budgets;
-    }
-    
-    // Update UI if not in silent mode
-    const container = document.getElementById('category-budget-container');
-    if (!container) return budgets;
-    
-    // Clear container - remove any existing no-data-message
-    const noDataMessage = container.querySelector('.no-data-message');
-    if (noDataMessage) {
-      container.removeChild(noDataMessage);
-    } else {
-      container.innerHTML = '';
-    }
-    
-    if (budgets.length === 0) {
-      container.innerHTML = '<p class="no-data-message">No budgets set. Add a budget to get started.</p>';
-      return budgets;
-    }
-    
-    // Create budget items
-    budgets.forEach(budget => {
-      const budgetItem = createCategoryBudgetItem(budget);
-      container.appendChild(budgetItem);
-    });
-    
-    return budgets;
-  } catch (error) {
-    console.error('Error loading category budgets:', error);
-    return [];
+// Store category budgets in memory (in a real app, these would be stored in a database)
+let categoryBudgets = JSON.parse(localStorage.getItem('categoryBudgets')) || [];
+
+// Load and display category budgets
+function loadCategoryBudgets() {
+  const container = document.getElementById('category-budgets-container');
+  if (!container) return;
+  
+  // Clear the container
+  container.innerHTML = '';
+  
+  // Get budgets from localStorage
+  const budgets = JSON.parse(localStorage.getItem('categoryBudgets') || '[]');
+  
+  // Save to global variable for other functions to use
+  window.categoryBudgets = budgets;
+  
+  if (budgets.length === 0) {
+    container.innerHTML = '<p class="no-data-message">No category budgets set. Add a budget to track your spending by category.</p>';
+    return;
   }
+  
+  // Create and append budget items
+  budgets.forEach(budget => {
+    const budgetItem = createCategoryBudgetItem(budget);
+    container.appendChild(budgetItem);
+  });
 }
 
 // Setup budget modal
@@ -447,7 +385,7 @@ function setupBudgetModal() {
           console.log('Saving custom category:', customName, customEmoji);
           await api.saveCategory(customName, customEmoji);
           console.log('Custom category saved successfully');
-          categoryValue = `${customEmoji}|${customName}`;
+          categoryValue = customName;
           categoryName = `${customEmoji} ${customName}`;
         } catch (error) {
           console.error('Error saving custom category:', error);
@@ -459,58 +397,26 @@ function setupBudgetModal() {
       // Check if we're editing an existing budget or creating a new one
       const existingBudgetIndex = categoryBudgets.findIndex(b => b.category === categoryValue);
       
-      let budget;
       if (existingBudgetIndex >= 0) {
         // Update existing budget
         categoryBudgets[existingBudgetIndex].amount = budgetAmount;
-        budget = categoryBudgets[existingBudgetIndex];
         showToast('Budget updated successfully');
       } else {
         // Add new budget
-        budget = {
+        categoryBudgets.push({
           category: categoryValue,
           categoryName: categoryName,
           amount: budgetAmount
-        };
-        categoryBudgets.push(budget);
+        });
         showToast('Budget added successfully');
       }
       
       // Save to localStorage
       localStorage.setItem('categoryBudgets', JSON.stringify(categoryBudgets));
       
-      // Update UI immediately
-      const budgetContainer = document.getElementById('category-budget-container');
-      if (budgetContainer) {
-        // Remove any no-data message
-        const noDataMessage = budgetContainer.querySelector('.no-data-message');
-        if (noDataMessage) {
-          budgetContainer.removeChild(noDataMessage);
-        }
-        
-        // If adding a new budget, just append it to the container
-        if (existingBudgetIndex < 0) {
-          const budgetItem = createCategoryBudgetItem(budget);
-          budgetContainer.appendChild(budgetItem);
-        } else {
-          // If updating, reload the entire list
-          loadCategoryBudgets();
-        }
-      }
-      
-      // Force clear and reload the current spend section
-      const spendContainer = document.getElementById('category-spend-container');
-      if (spendContainer) {
-        spendContainer.innerHTML = '<p class="loading-message">Updating spend data...</p>';
-      }
-      
-      // Get current timeframe from active button
-      const currentTimeframe = document.querySelector('.spend-timeframe-controls .timeframe-button.active')?.dataset.timeframe || 'month';
-      
-      // Reload the spend data with a slight delay to ensure DOM updates
-      setTimeout(() => {
-        loadCategorySpend(currentTimeframe);
-      }, 100);
+      // Update UI
+      loadCategoryBudgets();
+      loadCategorySpend();
       
       // Close the modal
       modal.style.display = 'none';
@@ -604,42 +510,29 @@ function createCategoryBudgetItem(budget) {
     
     const budgetItem = document.createElement('div');
     budgetItem.className = 'category-budget-item';
-    budgetItem.dataset.category = category;
     
     // Format the category name and extract emoji if present
     let displayName = category;
-    let emoji = '📊'; // Default emoji
+    let emoji = '';
     
     if (category.includes('|')) {
         const parts = category.split('|');
         emoji = parts[0];
         displayName = parts[1];
-    } else {
-        // Try to get emoji from the getCategoryEmoji function
-        const extractedEmoji = getCategoryEmoji(category);
-        if (extractedEmoji && extractedEmoji !== '📊') {
-            emoji = extractedEmoji;
-        }
     }
-    
-    // Format the amount with commas and decimals
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(parseFloat(amount) || 0);
     
     budgetItem.innerHTML = `
         <div class="budget-category">
-            <div class="budget-category-emoji">${emoji}</div>
-            <div class="budget-category-name">${displayName}</div>
+            <span class="category-emoji">${emoji}</span>
+            <span class="category-name">${displayName}</span>
         </div>
-        <div class="budget-amount">${formattedAmount}<span class="budget-period">/month</span></div>
+        <div class="budget-amount">$${parseFloat(amount).toFixed(2)}</div>
         <div class="budget-actions">
-            <button class="edit-budget-btn" title="Edit Budget" data-category="${category}">
-                Edit
+            <button class="edit-budget-btn" data-category="${category}">
+                <i class="fas fa-edit"></i>
             </button>
-            <button class="delete-budget-btn" title="Delete Budget" data-category="${category}">
-                Delete
+            <button class="delete-budget-btn" data-category="${category}">
+                <i class="fas fa-trash"></i>
             </button>
         </div>
     `;
@@ -657,15 +550,7 @@ function createCategoryBudgetItem(budget) {
 // Load and display category spend with progress circles
 async function loadCategorySpend(timeframe = 'month') {
     try {
-        console.log('Loading budgets for timeframe:', timeframe);
-        
-        // Normalize timeframe value
-        let normalizedTimeframe = timeframe.toLowerCase();
-        if (normalizedTimeframe === 'daily') normalizedTimeframe = 'day';
-        if (normalizedTimeframe === 'weekly') normalizedTimeframe = 'week';
-        if (normalizedTimeframe === 'monthly') normalizedTimeframe = 'month';
-        
-        updateTimeframeControls(timeframe);
+        updateTimeframeControls(timeframe, 'spend-timeframe-controls');
         
         const container = document.getElementById('category-spend-container');
         if (!container) {
@@ -674,228 +559,153 @@ async function loadCategorySpend(timeframe = 'month') {
         }
         
         // Show loading state
-        container.innerHTML = '<p class="loading-message">Loading budgets...</p>';
+        container.innerHTML = '<p class="loading-message">Loading category spend data...</p>';
         
-        // Get budgets from localStorage
-        const budgetsStr = localStorage.getItem('categoryBudgets');
-        let budgets = [];
+        // Fetch transactions for the selected timeframe
+        const transactions = await fetchTransactionsForTimeframe(timeframe);
         
-        if (budgetsStr) {
-            try {
-                budgets = JSON.parse(budgetsStr);
-                // Update global variable
-                window.categoryBudgets = budgets;
-            } catch (e) {
-                console.error('Error parsing budgets from localStorage:', e);
-            }
-        }
-        
-        // Check if we have any budgets
-        if (!budgets || budgets.length === 0) {
-            container.innerHTML = `
-                <div class="no-budgets-message">
-                    <p>You haven't set any monthly budgets yet.</p>
-                    <p>Create your first budget to start tracking your spending.</p>
-                    <button id="create-first-budget" class="action-button">Create Your First Budget</button>
-                </div>
-            `;
-            
-            // Add event listener to the create budget button
-            const createBudgetBtn = document.getElementById('create-first-budget');
-            if (createBudgetBtn) {
-                createBudgetBtn.addEventListener('click', () => {
-                    openBudgetModal();
-                });
-            }
-            
+        if (!transactions || transactions.length === 0) {
+            container.innerHTML = '<p class="no-data-message">No transactions found for this timeframe.</p>';
             return;
         }
         
-        // Calculate date range for future timeframe
-        const dateRange = calculateDateRange(normalizedTimeframe);
-        const daysDifference = dateRange.days || 30; // Use the calculated days or default to 30
+        // Get budgets from the window object instead of the API call
+        const budgets = window.categoryBudgets || [];
         
-        // Clear container
-        container.innerHTML = '';
+        // Process transactions to get spending by category
+        const categories = {};
         
-        // Add title and subtitle
-        const titleElement = document.createElement('h3');
-        titleElement.className = 'spend-section-title';
-        titleElement.textContent = 'Budget for Selected Period';
-        container.appendChild(titleElement);
+        transactions.forEach(transaction => {
+            if (!transaction.category) return;
+            
+            const categoryName = cleanCategoryName(transaction.category);
+            const isExpense = transaction.type === 'Withdrawal';
+            
+            if (!categories[categoryName]) {
+                categories[categoryName] = {
+                    category: categoryName,
+                    spent: 0,
+                    budget: 0,
+                    originalCategory: transaction.category
+                };
+            }
+            
+            if (isExpense) {
+                categories[categoryName].spent += Math.abs(parseFloat(transaction.amount) || 0);
+            }
+        });
         
-        const subtitleElement = document.createElement('p');
-        subtitleElement.className = 'spend-section-subtitle';
-        subtitleElement.textContent = dateRange.displayText;
-        container.appendChild(subtitleElement);
-        
-        // Creating HTML for each budgeted category
-        const budgetedCategories = [];
-        const daysInMonth = 30; // Standard month length for budget calculation
-        
-        // Prepare data for all budgeted categories
+        // Add budget information
         budgets.forEach(budget => {
-            if (!budget || !budget.category) return;
-            
             const categoryName = cleanCategoryName(budget.category);
-            const monthlyBudget = parseFloat(budget.amount) || 0;
-            
-            // Skip invalid budgets
-            if (monthlyBudget <= 0) return;
-            
-            // Calculate budget for this timeframe
-            const timeframeBudget = (monthlyBudget / daysInMonth) * daysDifference;
-            
-            budgetedCategories.push({
-                category: budget.category, // Original category with emoji
-                categoryName: categoryName, // Clean category name
-                spent: 0, // Start with 0 spent
-                budget: timeframeBudget, // Pro-rated budget for timeframe
-                monthlyBudget: monthlyBudget, // Original monthly budget
-                days: daysDifference // Days in the timeframe
+            if (categories[categoryName]) {
+                categories[categoryName].budget = parseFloat(budget.amount) || 0;
+            } else {
+                // Add categories that have budgets but no transactions
+                categories[categoryName] = {
+                    category: categoryName,
+                    spent: 0,
+                    budget: parseFloat(budget.amount) || 0,
+                    originalCategory: budget.category
+                };
+            }
+        });
+        
+        // Convert to array and sort - show categories with budgets first
+        const categoriesArray = Object.values(categories)
+            .sort((a, b) => {
+                // Categories with budgets come first
+                if (a.budget > 0 && b.budget === 0) return -1;
+                if (a.budget === 0 && b.budget > 0) return 1;
+                // Then sort by spend amount
+                return b.spent - a.spent;
             });
-        });
         
-        // Sort categories by budget amount
-        budgetedCategories.sort((a, b) => b.budget - a.budget);
-        
-        // Create HTML elements for each category
-        budgetedCategories.forEach(data => {
-            const budgetItem = createBudgetProgressItem(
-                data.category,
-                data.categoryName,
-                data.spent,
-                data.budget,
-                false,
-                data.days,
-                data.monthlyBudget
-            );
-            container.appendChild(budgetItem);
-        });
-        
-        // Display message if no categories with budgets
-        if (budgetedCategories.length === 0) {
-            container.innerHTML = `
-                <p class="no-data-message">No budgeted categories found. Set a budget for at least one category.</p>
-            `;
-        }
+        // Display the categories
+        displayCategorySpend(categoriesArray);
         
     } catch (error) {
-        console.error('Error loading budgets:', error);
+        console.error('Error loading category spend:', error);
+        const container = document.getElementById('category-spend-container');
         if (container) {
-            container.innerHTML = `
-                <p class="error-message">Failed to load budgets. Please try again later.</p>
-            `;
+            container.innerHTML = '<p class="error-message">Failed to load category spend data.</p>';
         }
     }
 }
 
-// Helper function to fetch transactions specifically for the current month
-async function fetchTransactionsForMonth(startDate, endDate) {
-    try {
-        // Format dates for the API
-        const startDateStr = startDate.toISOString().split('T')[0];
-        const endDateStr = endDate.toISOString().split('T')[0];
-        
-        // Get transactions from the API
-        const transactions = await api.getTransactions();
-        
-        // Filter transactions by date range
-        return transactions.filter(transaction => {
-            const transactionDate = new Date(transaction.date);
-            return transactionDate >= startDate && transactionDate <= endDate;
-        });
-    } catch (error) {
-        console.error('Error fetching transactions for month:', error);
-        return [];
-    }
-}
-
-// Create a budget progress item with horizontal bar
-function createBudgetProgressItem(category, categoryName, spent, budget, isProjection = false, days = 30, monthlyBudget = 0) {
-    // Validate inputs
-    if (!category || isNaN(budget) || budget <= 0) {
-        console.warn('Invalid data for budget progress item:', { category, categoryName, spent, budget });
-        return document.createElement('div'); // Return empty div if invalid
-    }
-    
-    // Calculate percentage (since spent is 0, this will be 0)
-    const percentage = 0;
+// Function to create a spend circle
+function createSpendCircle(category, spent, budget) {
+    // Calculate percentage and status
+    const percentage = budget > 0 ? Math.min(Math.round((spent / budget) * 100), 100) : 0;
     let status = 'on-track';
     
-    // Get emoji
-    const emoji = getCategoryEmoji(category);
-    
-    // Format currency values
-    const budgetFormatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(budget);
-    
-    // Format monthly budget for reference
-    const monthlyBudgetFormatted = monthlyBudget ? new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(monthlyBudget) : '';
-    
-    // Create container element
-    const container = document.createElement('div');
-    container.className = `spend-item ${status}`;
-    if (isProjection) container.classList.add('projection');
-    container.dataset.category = category;
-    
-    // Create the SVG circle with proper stroke properties
-    const radius = 30;
-    const circumference = 2 * Math.PI * radius;
-    const dashOffset = circumference; // Full offset for 0% progress
-    
-    // Determine period text based on days
-    let periodText = '';
-    const today = new Date();
-    const endOfYear = new Date(today.getFullYear(), 11, 31);
-    const daysUntilEndOfYear = Math.round((endOfYear - today) / (1000 * 60 * 60 * 24));
-    
-    if (days === 1) {
-        periodText = 'today';
-    } else if (days === daysUntilEndOfYear) {
-        periodText = 'until end of year';
-    } else {
-        periodText = 'next ' + days + ' days';
+    if (percentage >= 85 && percentage < 100) {
+        status = 'warning';
+    } else if (percentage >= 100) {
+        status = 'over-budget';
     }
     
-    // Create the HTML structure with goal-like circular progress
-    container.innerHTML = `
-        <a href="transaction.html?category=${encodeURIComponent(category)}" class="spend-item-link">
-            <div class="category-progress">
-                <svg class="progress-ring" width="70" height="70">
-                    <circle class="progress-ring-circle-bg" 
-                        stroke-width="5" 
-                        fill="transparent" 
-                        r="${radius}" 
-                        cx="35" 
-                        cy="35"/>
-                    <circle class="progress-ring-circle" 
-                        stroke-width="5" 
-                        fill="transparent" 
-                        r="${radius}" 
-                        cx="35" 
+    // Get emoji for category
+    const emoji = getCategoryEmoji(category);
+    
+    // Create SVG parameters for the progress circle
+    const radius = 30;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (percentage / 100) * circumference;
+    
+    // Create the spend item element
+    const spendItem = document.createElement('div');
+    spendItem.className = 'spend-item';
+    
+    // Set the HTML content - simplified layout with green background
+    spendItem.innerHTML = `
+        <div class="spend-item-minimal">
+            <div class="spend-circle-minimal">
+                <svg class="progress-ring-minimal" width="70" height="70">
+                    <circle
+                        class="progress-ring-circle-bg"
+                        stroke="#ffffff"
+                        stroke-width="4"
+                        stroke-opacity="0.3"
+                        fill="transparent"
+                        r="${radius}"
+                        cx="35"
                         cy="35"
-                        stroke-dasharray="${circumference}"
-                        stroke-dashoffset="${dashOffset}"
-                        transform="rotate(-90, 35, 35)"/>
+                    />
+                    <circle
+                        class="progress-ring-circle"
+                        stroke="#ffffff"
+                        stroke-width="4"
+                        fill="transparent"
+                        r="${radius}"
+                        cx="35"
+                        cy="35"
+                        stroke-dasharray="${circumference} ${circumference}"
+                        stroke-dashoffset="${offset}"
+                        stroke-linecap="round"
+                    />
                 </svg>
-                <div class="category-emoji">${emoji}</div>
-                <div class="progress-text">${percentage}%</div>
+                <div class="progress-text-minimal">
+                    <div class="percentage">${percentage}%</div>
+                </div>
             </div>
-            <div class="category-info">
-                <div class="category-name">${categoryName}</div>
-                <div class="spend-amount">$0.00 of ${budgetFormatted}</div>
-                <div class="status-indicator">On track</div>
+            <div class="spend-details-minimal">
+                <div class="category-header">
+                    <span class="category-emoji">${emoji}</span>
+                    <span class="category-name">${category}</span>
+                </div>
+                <div class="spend-amount">
+                    $${spent.toFixed(2)} of $${budget.toFixed(2)}
+                </div>
+                <div class="spend-status">
+                    ${status === 'on-track' ? 'On track' : 
+                      status === 'warning' ? 'Approaching limit' : 'Over budget'}
+                </div>
             </div>
-        </a>
+        </div>
     `;
     
-    return container;
+    return spendItem;
 }
 
 // Helper function to fetch transactions for a specific timeframe
@@ -919,52 +729,31 @@ async function fetchTransactionsForTimeframe(timeframe) {
 // Helper function to calculate date range based on timeframe
 function calculateDateRange(timeframe) {
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Start of today
-    let endDate = new Date(today); // Default end date is today
-    let displayText = '';
+    let startDate = new Date();
     
     switch (timeframe) {
-        case 'day':
-            // Just today (24 hours)
-            endDate.setDate(today.getDate() + 1);
-            displayText = 'Today only';
-            break;
         case 'week':
-            // 1 week from today
-            endDate.setDate(today.getDate() + 7);
-            displayText = `From today to ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+            startDate.setDate(now.getDate() - 7);
             break;
         case 'month':
-            // 1 month from today
-            endDate.setMonth(today.getMonth() + 1);
-            displayText = `From today to ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+            startDate.setMonth(now.getMonth() - 1);
             break;
-        case '3m':
-            // 3 months from today
-            endDate.setMonth(today.getMonth() + 3);
-            displayText = `From today to ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        case 'quarter':
+            startDate.setMonth(now.getMonth() - 3);
             break;
-        case '6m':
-            // 6 months from today
-            endDate.setMonth(today.getMonth() + 6);
-            displayText = `From today to ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        case 'year':
+            startDate.setFullYear(now.getFullYear() - 1);
             break;
-        case 'ytd':
-            // End of current year
-            endDate = new Date(today.getFullYear(), 11, 31);
-            displayText = `From today to Dec 31, ${today.getFullYear()}`;
+        case 'all':
+            startDate = new Date(2000, 0, 1); // Far past date to include everything
             break;
         default:
-            // Default to 1 month
-            endDate.setMonth(today.getMonth() + 1);
-            displayText = `From today to ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+            startDate.setMonth(now.getMonth() - 1); // Default to month
     }
     
     return {
-        startDate: today.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
-        displayText: displayText,
-        days: Math.round((endDate - today) / (1000 * 60 * 60 * 24))
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: now.toISOString().split('T')[0]
     };
 }
 
@@ -978,6 +767,22 @@ function cleanCategoryName(category) {
     }
     
     return category.trim();
+}
+
+// Update timeframe control buttons
+function updateTimeframeControls(selectedTimeframe, controlsId) {
+    const controls = document.getElementById(controlsId);
+    if (!controls) return;
+    
+    const buttons = controls.querySelectorAll('.timeframe-button');
+    buttons.forEach(button => {
+        const timeframe = button.getAttribute('data-timeframe');
+        if (timeframe === selectedTimeframe) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
 }
 
 // Load and display active categories
@@ -1117,7 +922,7 @@ function showToast(message, type = 'success') {
 
 // Setup timeframe controls for current spend
 function setupSpendTimeframeControls() {
-    const timeframeButtons = document.querySelectorAll('.category-box.bottom-left .time-btn');
+    const timeframeButtons = document.querySelectorAll('#spend-timeframe-controls .timeframe-button');
     if (!timeframeButtons.length) return;
     
     timeframeButtons.forEach(button => {
@@ -1172,66 +977,50 @@ function displayCategorySpend(categories) {
  * or returning a default emoji based on the category name
  */
 function getCategoryEmoji(category) {
-    // List of predefined categories and their emojis
-    const emojiMap = {
-        'food': '🍔',
-        'dining': '🍽️',
-        'groceries': '🛒',
-        'restaurant': '🍲',
-        'transport': '🚗',
-        'transportation': '🚗',
-        'travel': '✈️',
-        'gas': '⛽',
-        'fuel': '⛽',
-        'bills': '📄',
-        'utilities': '💡',
-        'electricity': '💡',
-        'water': '💧',
-        'shopping': '🛍️',
-        'clothes': '👕',
-        'entertainment': '🎬',
-        'movies': '🎞️',
-        'games': '🎮',
-        'health': '🏥',
-        'medical': '💊',
-        'fitness': '🏋️',
-        'education': '📚',
-        'books': '📖',
-        'courses': '🎓',
-        'housing': '🏠',
-        'rent': '🏘️',
-        'mortgage': '🏡',
-        'savings': '💰',
-        'investment': '📈',
-        'income': '💵',
-        'salary': '💼',
-        'gift': '🎁',
-        'donation': '🎗️',
-        'withdrawal': '💸',
-        'deposit': '💵',
-        'transfer': '↔️',
-        'subscription': '🔄',
-        'insurance': '🛡️',
-        'tax': '📝',
-        'pet': '🐾',
-        'childcare': '👶',
-        'personal': '👤',
-        'other': '📌',
-        'miscellaneous': '🔮',
-        'refund': '💰'
-    };
-    
-    // Check if the category contains a predefined emoji
-    if (category && category.includes('|')) {
+    // If category contains an emoji separator (format: "emoji|category")
+    if (typeof category === 'string' && category.includes('|')) {
         const parts = category.split('|');
-        if (parts.length > 0 && parts[0].trim()) {
-            return parts[0].trim();
-        }
+        return parts[0]; // Return the emoji part
     }
     
-    // If no emoji in the category string, search for keywords
-    if (category) {
-        for (const [key, emoji] of Object.entries(emojiMap)) {
+    // Default emojis based on common categories
+    const defaultEmojis = {
+        'Food': '🍔',
+        'Groceries': '🛒',
+        'Dining': '🍽️',
+        'Restaurant': '🍽️',
+        'Transportation': '🚗',
+        'Travel': '✈️',
+        'Utilities': '💡',
+        'Entertainment': '🎬',
+        'Shopping': '🛍️',
+        'Health': '⚕️',
+        'Fitness': '🏋️',
+        'Education': '📚',
+        'Housing': '🏠',
+        'Rent': '🏢',
+        'Insurance': '🔐',
+        'Subscriptions': '📱',
+        'Income': '💰',
+        'Savings': '💵',
+        'Investments': '📈',
+        'Bills': '📝',
+        'Clothing': '👕',
+        'Personal': '👤',
+        'Pets': '🐾',
+        'Gifts': '🎁',
+        'Charity': '❤️',
+        'Technology': '💻',
+        'Home': '🏡',
+        'Business': '💼',
+        'Taxes': '📊',
+        'Miscellaneous': '🔄',
+        'Other': '📦'
+    };
+    
+    // Check if we have a default emoji for this category
+    if (typeof category === 'string') {
+        for (const [key, emoji] of Object.entries(defaultEmojis)) {
             if (category.toLowerCase().includes(key.toLowerCase())) {
                 return emoji;
             }
@@ -1240,43 +1029,5 @@ function getCategoryEmoji(category) {
     
     // Return a generic emoji if no match is found
     return '📊';
-}
-
-/**
- * Updates a budget progress circle with a new percentage
- * @param {HTMLElement} circleElement - The SVG circle element
- * @param {number} percentage - Progress percentage (0-100)
- */
-function updateBudgetProgress(circleElement, percentage) {
-    if (!circleElement || isNaN(percentage)) return;
-    
-    // Clamp percentage between 0-100
-    const validPercentage = Math.max(0, Math.min(100, percentage));
-    
-    // Calculate new offset
-    const radius = parseInt(circleElement.getAttribute('r'));
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (validPercentage / 100) * circumference;
-    
-    // Update the circle
-    circleElement.style.strokeDashoffset = offset;
-    
-    // Find and update the percentage text
-    const progressItem = circleElement.closest('.spend-item');
-    if (progressItem) {
-        const percentText = progressItem.querySelector('.progress-text');
-        if (percentText) {
-            percentText.textContent = validPercentage + '%';
-        }
-        
-        // Update status class
-        progressItem.classList.remove('on-track', 'warning', 'over-budget');
-        if (validPercentage >= 100) {
-            progressItem.classList.add('over-budget');
-        } else if (validPercentage >= 85) {
-            progressItem.classList.add('warning');
-        } else {
-            progressItem.classList.add('on-track');
-        }
-    }
-}
+} 
+} 

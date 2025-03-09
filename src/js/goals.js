@@ -396,12 +396,7 @@ function showError(message) {
 window.openNewGoalModal = () => openModal('newGoalModal');
 window.deleteGoal = async (goalId) => {
     try {
-        // Confirm deletion
-        if (!confirm('Are you sure you want to delete this goal? Any funds will be returned to your balance.')) {
-            return;
-        }
-        
-        // Find the goal card and add a "deleting" class
+        // Find the goal card and add a "deleting" class to show it's being processed
         const goalCard = document.querySelector(`.goal-card[data-goal-id="${goalId}"]`);
         if (goalCard) {
             goalCard.classList.add('deleting');
@@ -412,14 +407,21 @@ window.deleteGoal = async (goalId) => {
         
         // Process the result
         if (result.success) {
-            // If there was a refund, show it in the message
-            if (result.refundedAmount && result.refundedAmount > 0) {
+            // Check if there was a refund from the updated API response
+            if (result.refundAmount && result.refundAmount > 0) {
                 // Update the balance display if a function exists for that
                 if (typeof updateBalanceDisplay === 'function') {
-                    updateBalanceDisplay(result.newBalance);
+                    // Fetch the updated balance to display
+                    try {
+                        const balanceData = await window.api.getBalance();
+                        updateBalanceDisplay(balanceData.balance);
+                    } catch (err) {
+                        console.error('Error updating balance display:', err);
+                    }
                 }
                 
-                showToast(`Goal deleted successfully. $${result.refundedAmount.toFixed(2)} has been refunded to your balance.`, 'success');
+                // Show a success message with the refund amount
+                showToast(`Goal deleted successfully. $${parseFloat(result.refundAmount).toFixed(2)} has been refunded to your balance.`, 'success');
             } else {
                 showToast('Goal deleted successfully.', 'success');
             }
@@ -628,84 +630,6 @@ async function handleCategoryChange(event) {
 }
 
 /**
- * Initialize the goals timeline chart
- * @param {Array} goals - Array of goals with recurring payments
- */
-function initializeGoalsTimelineChart(goals) {
-    // Find the chart container
-    let chartContainer = document.getElementById('goalsTimelineChart');
-    
-    if (!chartContainer) {
-        console.error('Timeline chart container not found');
-        return;
-    }
-    
-    // Clear the container
-    chartContainer.innerHTML = '';
-    
-    // Filter goals to only include those with recurring payments
-    const goalsWithRecurring = goals.filter(goal => {
-        // Check if goal has valid recurring payments
-        if (!goal.recurring || !Array.isArray(goal.recurring) || goal.recurring.length === 0) {
-            return false;
-        }
-        return true;
-    });
-    
-    // If no goals have recurring payments, show a message
-    if (goalsWithRecurring.length === 0) {
-        chartContainer.innerHTML = `
-            <div class="no-recurring-goals">
-                <p>No recurring deposits set up yet.</p>
-                <p>Add a recurring deposit to any goal to start tracking your progress over time.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    try {
-        // Make the container visible
-        chartContainer.style.display = 'block';
-        chartContainer.style.height = '350px';
-        chartContainer.style.width = '100%';
-        chartContainer.style.position = 'relative';
-        chartContainer.style.zIndex = '1';
-        
-        // Prepare series data for the chart
-        const seriesData = [];
-        const currentDate = new Date();
-        const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + 12); // Look ahead 12 months
-        
-        // Process each goal with recurring payments
-        goalsWithRecurring.forEach((goal, index) => {
-            try {
-                // Generate a unique color for this goal
-                const colorHue = (index * 137) % 360; // Golden angle approximation for even distribution
-                const color = `hsl(${colorHue}, 70%, 50%)`;
-                
-                // Create series for this goal
-                const series = createGoalSeries(goal, [], color, currentDate, endDate);
-                
-                // Add to series data for chart
-                seriesData.push(series);
-            } catch (error) {
-                console.error(`Error processing goal "${goal.title}" for chart:`, error);
-            }
-        });
-        
-        // Set up event listeners for the timeframe buttons
-        setupTimeframeButtons();
-        
-        // Render the chart with the prepared series data
-        renderTimelineChart(seriesData, chartContainer);
-    } catch (error) {
-        console.error('Error initializing goals timeline chart:', error);
-        chartContainer.innerHTML = '<p class="error-message">Could not load timeline chart. Please try again later.</p>';
-    }
-}
-
-/**
  * Setup timeframe buttons to switch between different time periods
  */
 function setupTimeframeButtons() {
@@ -721,14 +645,351 @@ function setupTimeframeButtons() {
             // Get the selected timeframe
             const timeframe = this.getAttribute('data-timeframe');
             
-            // Update active state
-            timeButtons.forEach(btn => btn.classList.remove('active'));
+            // Update active state - need to get fresh references to all buttons
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
             this.classList.add('active');
             
-            // Reload goals with the new timeframe
-            await loadGoals();
+            // Re-initialize the goals timeline chart with the new timeframe
+            // Instead of reloading all goals, just update the chart with the current goals
+            if (window.goals && window.goals.length > 0) {
+                // Store the selected timeframe in a global variable
+                window.selectedTimeframe = timeframe;
+                
+                // Re-initialize the chart with the new timeframe
+                initializeGoalsTimelineChart(window.goals);
+                
+                console.log(`Updating goals chart with timeframe: ${timeframe}`);
+            } else {
+                // If no goals are loaded yet, reload everything
+                await loadGoals();
+            }
         });
     });
+    
+    // Set default active button (6 months)
+    const defaultButton = document.querySelector('.time-btn[data-timeframe="6M"]');
+    if (defaultButton) {
+        defaultButton.classList.add('active');
+        window.selectedTimeframe = "6M"; // Set default timeframe
+    }
+}
+
+/**
+ * Initialize the goals timeline chart
+ * @param {Array} goals - Array of goals with recurring payments
+ */
+function initializeGoalsTimelineChart(goals) {
+    // Find the chart container
+    let chartContainer = document.getElementById('goalsTimelineChart');
+    
+    if (!chartContainer) {
+        console.error('Timeline chart container not found');
+        return;
+    }
+    
+    // First, check if there's an existing chart and destroy it
+    if (window.goalsChart) {
+        console.log('Destroying old chart before creating a new one');
+        window.goalsChart.destroy();
+        window.goalsChart = null;
+    }
+    
+    // Clear the container
+    chartContainer.innerHTML = '';
+    
+    // If there are no goals, show a message
+    if (!goals || goals.length === 0) {
+        chartContainer.innerHTML = '<p class="no-data-message">No goals available to display.</p>';
+        return;
+    }
+    
+    try {
+        // Get the selected timeframe or use default
+        const timeframe = window.selectedTimeframe || '6M';
+        console.log(`Rendering goals chart with timeframe: ${timeframe}`);
+        
+        // Calculate start and end dates based on timeframe
+        const startDate = new Date(); // Start date is always today
+        let endDate = new Date();     // End date will be adjusted based on timeframe
+        
+        // Set end date based on timeframe
+        switch (timeframe) {
+            case '1M':
+                endDate.setMonth(endDate.getMonth() + 1);
+                break;
+            case '3M':
+                endDate.setMonth(endDate.getMonth() + 3);
+                break;
+            case '6M':
+                endDate.setMonth(endDate.getMonth() + 6);
+                break;
+            case 'YTD':
+                // From today to end of year
+                endDate = new Date(new Date().getFullYear(), 11, 31);
+                break;
+            case '1Y':
+                endDate.setFullYear(endDate.getFullYear() + 1);
+                break;
+            case 'ALL':
+                // For "All Time", we'll show from earliest goal date to 1 year in the future
+                let earliestDate = new Date();
+                goals.forEach(goal => {
+                    const goalDate = new Date(goal.created_at || goal.date || new Date());
+                    if (goalDate < earliestDate) {
+                        earliestDate = goalDate;
+                    }
+                });
+                // Start from earliest goal date with padding
+                startDate.setTime(earliestDate.getTime());
+                startDate.setMonth(startDate.getMonth() - 1);
+                // End date is 1 year in the future
+                endDate.setFullYear(endDate.getFullYear() + 1);
+                break;
+            default:
+                // Default to 6 months in the future
+                endDate.setMonth(endDate.getMonth() + 6);
+        }
+        
+        // We don't need a separate futureEndDate variable anymore since endDate is already in the future
+        
+        // Prepare data for the timeline chart
+        let seriesData = [];
+        
+        // Process each goal
+        goals.forEach((goal, index) => {
+            // Skip goals without valid data
+            if (!goal.title || !goal.target_amount) return;
+            
+            // Generate a color for this goal
+            const color = getColorForIndex(index);
+            
+            // Create a series for this goal
+            const series = createGoalSeries(goal, [], color, startDate, endDate);
+            
+            // Add to the series data
+            if (series) {
+                seriesData.push(series);
+            }
+        });
+        
+        // Render the chart with the prepared series data
+        renderTimelineChart(seriesData, chartContainer, startDate, endDate);
+    } catch (error) {
+        console.error('Error initializing goals timeline chart:', error);
+        chartContainer.innerHTML = '<p class="error-message">Could not load timeline chart. Please try again later.</p>';
+    }
+}
+
+/**
+ * Render the timeline chart with the provided series data
+ * @param {Array} seriesData - Series data for the chart
+ * @param {HTMLElement} container - Container element for the chart
+ * @param {Date} startDate - Start date for the chart
+ * @param {Date} endDate - End date for the chart
+ */
+function renderTimelineChart(seriesData, container, startDate, endDate) {
+    // If there's no valid data, show a message
+    if (!seriesData || seriesData.length === 0) {
+        container.innerHTML = '<p class="no-data-message">No goals with data available to display.</p>';
+        return;
+    }
+    
+    // Default options for the chart
+    const options = {
+        series: seriesData,
+        chart: {
+            height: 350,
+            type: 'line',
+            animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800,
+                animateGradually: {
+                    enabled: true,
+                    delay: 150
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350
+                }
+            },
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
+            }
+        },
+        stroke: {
+            width: 3,
+            curve: 'smooth'
+        },
+        grid: {
+            borderColor: '#e7e7e7',
+            row: {
+                colors: ['#f3f3f3', 'transparent'],
+                opacity: 0.5
+            }
+        },
+        markers: {
+            size: 4,
+            hover: {
+                size: 6
+            }
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                formatter: function(val) {
+                    return new Date(val).toLocaleDateString();
+                }
+            },
+            min: startDate.getTime(),
+            max: endDate.getTime(),
+            title: {
+                text: 'Date'
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Goal Progress (%)'
+            },
+            min: 0,
+            max: 100,
+            labels: {
+                formatter: function(val) {
+                    return val.toFixed(0) + '%';
+                }
+            }
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center',
+            floating: false,
+            offsetY: -25,
+            offsetX: 0
+        },
+        tooltip: {
+            x: {
+                format: 'dd MMM yyyy'
+            },
+            y: {
+                formatter: function(val) {
+                    return val.toFixed(1) + '%';
+                }
+            }
+        }
+    };
+
+    // Create the chart
+    const chart = new ApexCharts(container, options);
+    chart.render();
+    
+    // Store the chart instance in window so we can destroy it later
+    window.goalsChart = chart;
+}
+
+// Helper function to load ApexCharts if it's not already loaded
+function loadApexCharts(callback) {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
+    script.onload = callback;
+    document.head.appendChild(script);
+}
+
+// Helper function to dump page structure for debugging
+function dumpPageStructure() {
+    console.log('Page structure (first 1000 chars):', document.body.innerHTML.substring(0, 1000) + '...');
+}
+
+// Add showToast function since it's missing
+function showToast(message, type = 'info') {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    
+    // Use existing showError for error messages
+    if (type === 'error') {
+        if (typeof showError === 'function') {
+            showError(message);
+            return;
+        }
+    }
+    
+    // For other types, use alert
+    alert(message);
+    // In a real implementation, this would show a styled toast message
+}
+
+// Add the missing function to avoid errors
+function setupRecurringPaymentForms() {
+    console.log('Setting up recurring payment forms');
+    
+    // Get the recurring payment form
+    const recurringPaymentForm = document.getElementById('recurring-payment-form');
+    if (!recurringPaymentForm) {
+        console.log('Recurring payment form not found');
+        return;
+    }
+    
+    // Add event listener for the form submission
+    recurringPaymentForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(recurringPaymentForm);
+        const goalId = formData.get('goal-id');
+        const amount = parseFloat(formData.get('amount'));
+        const frequency = formData.get('frequency');
+        
+        if (!goalId || isNaN(amount) || amount <= 0 || !frequency) {
+            showToast('Please fill out all fields correctly', 'error');
+            return;
+        }
+        
+        try {
+            // Create the recurring payment
+            await createRecurringPayment(goalId, amount, frequency);
+            
+            // Close the modal and show success message
+            const modal = document.getElementById('recurring-payment-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            
+            showToast('Recurring payment set up successfully!', 'success');
+            
+            // Reload goals to show the updated data
+            await loadGoals();
+        } catch (error) {
+            console.error('Error setting up recurring payment:', error);
+            showToast('Failed to set up recurring payment', 'error');
+        }
+    });
+}
+
+// Also add a stub for setupSignOut if it's referenced
+function setupSignOut() {
+    console.log('Setting up sign out button');
+    const signOutButton = document.getElementById('sign-out-btn');
+    if (signOutButton) {
+        signOutButton.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+    }
+}
+
+function getColorForIndex(index) {
+    // Generate a color based on the index using HSL for even distribution
+    const colorHue = (index * 137.5) % 360; // Golden angle approximation for even distribution
+    return `hsl(${colorHue}, 70%, 50%)`;
 }
 
 /**
@@ -749,6 +1010,10 @@ function createGoalSeries(goal, dataPoints = [], color, startDate, endDate) {
         
         // Create an array to hold all data points
         const allPoints = [];
+        
+        // Add initial point (at creation date or start date, whichever is later)
+        const goalCreationDate = new Date(goal.created_at || goal.date || new Date());
+        const initialDate = goalCreationDate > startDate ? goalCreationDate : startDate;
         
         // Start with current progress
         allPoints.push({
@@ -890,316 +1155,4 @@ function addDaysBasedOnFrequency(date, frequency) {
     }
     
     return newDate;
-}
-
-/**
- * Render a timeline chart with the provided series data
- * @param {Array} seriesData - Array of series data objects
- * @param {HTMLElement} container - The container element for the chart
- */
-function renderTimelineChart(seriesData, container) {
-    if (!seriesData || seriesData.length === 0) {
-        container.innerHTML = `
-            <div class="no-recurring-goals">
-                <p>No recurring deposits set up yet.</p>
-                <p>Add a recurring deposit to any goal to start tracking your progress over time.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Make sure each series has a valid data array
-    const validatedSeries = [];
-    
-    for (let i = 0; i < seriesData.length; i++) {
-        const series = seriesData[i];
-        
-        // First check if we have old format (actual + projected) and convert it
-        if (series.actual && Array.isArray(series.actual)) {
-            // Combine actual and projected arrays into a single data array
-            const combinedData = [...series.actual];
-            
-            if (series.projected && Array.isArray(series.projected)) {
-                // Skip duplicates between actual and projected
-                const lastActualPoint = series.actual.length > 0 ? 
-                    new Date(series.actual[series.actual.length - 1].x).getTime() : 0;
-                    
-                series.projected.forEach(point => {
-                    const pointDate = new Date(point.x).getTime();
-                    if (pointDate > lastActualPoint) {
-                        combinedData.push(point);
-                    }
-                });
-            }
-            
-            // Create a new format series
-            const convertedSeries = {
-                name: series.name,
-                data: combinedData.map(point => ({
-                    x: typeof point.x === 'number' ? point.x : new Date(point.x).getTime(),
-                    y: typeof point.y === 'number' ? point.y : parseFloat(point.y) || 0
-                })),
-                color: series.color
-            };
-            
-            validatedSeries.push(convertedSeries);
-            continue;
-        }
-        
-        // Check if series has data property and it's an array
-        if (!series.data || !Array.isArray(series.data) || series.data.length === 0) {
-            // Create a minimal valid series
-            validatedSeries.push({
-                name: series.name || `Goal ${i+1}`,
-                data: [
-                    { x: new Date().getTime(), y: 0 },
-                    { x: new Date().getTime() + 86400000, y: 0 } // next day
-                ],
-                color: series.color || '#cccccc'
-            });
-        } else {
-            // Ensure all data points have correct x and y properties
-            const validData = series.data.map(point => {
-                return {
-                    x: typeof point.x === 'number' ? point.x : new Date(point.x).getTime(),
-                    y: typeof point.y === 'number' ? point.y : parseFloat(point.y) || 0
-                };
-            });
-            
-            validatedSeries.push({
-                name: series.name || `Goal ${i+1}`,
-                data: validData,
-                color: series.color || '#cccccc'
-            });
-        }
-    }
-    
-    if (validatedSeries.length === 0) {
-        container.innerHTML = `<p class="error-message">No valid data available for the chart. Please add recurring deposits to your goals.</p>`;
-        return;
-    }
-    
-    // Make sure the container is properly styled
-    container.style.height = '350px';
-    container.style.width = '100%';
-    container.style.display = 'block';
-    container.style.position = 'relative';
-    container.style.zIndex = '1';
-    container.style.overflow = 'visible';
-    
-    // Add custom CSS for the chart (only once)
-    const chartStyleId = 'apexcharts-custom-styles';
-    if (!document.getElementById(chartStyleId)) {
-        const chartStyles = document.createElement('style');
-        chartStyles.id = chartStyleId;
-        chartStyles.textContent = `
-            #goalsTimelineChart {
-                min-height: 350px;
-                width: 100%;
-                margin: 20px 0;
-            }
-            .apexcharts-canvas {
-                position: relative !important;
-                z-index: 10;
-                margin: 0 auto;
-            }
-        `;
-        document.head.appendChild(chartStyles);
-    }
-    
-    // Render the chart using ApexCharts
-    try {
-        // Create the chart options
-        const options = {
-            series: validatedSeries,
-            chart: {
-                height: 350,
-                type: 'line',
-                zoom: {
-                    enabled: false
-                },
-                animations: {
-                    enabled: true
-                },
-                toolbar: {
-                    show: false
-                },
-                fontFamily: 'Poppins, Arial, sans-serif'
-            },
-            colors: validatedSeries.map(s => s.color),
-            stroke: {
-                width: 3,
-                curve: 'smooth'
-            },
-            grid: {
-                borderColor: '#e0e0e0',
-                row: {
-                    colors: ['transparent', 'transparent'],
-                    opacity: 0.2
-                }
-            },
-            xaxis: {
-                type: 'datetime',
-                labels: {
-                    datetimeUTC: false,
-                    format: 'MMM dd, yyyy',
-                    style: {
-                        colors: '#666',
-                        fontSize: '12px'
-                    }
-                }
-            },
-            yaxis: {
-                title: {
-                    text: 'Completion (%)',
-                    style: {
-                        fontWeight: 500,
-                        fontSize: '14px'
-                    }
-                },
-                min: 0,
-                max: 100,
-                labels: {
-                    formatter: function(val) {
-                        return val.toFixed(0) + '%';
-                    },
-                    style: {
-                        colors: '#666',
-                        fontSize: '12px'
-                    }
-                }
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'right',
-                fontSize: '13px'
-            },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                x: {
-                    format: 'MMM dd, yyyy'
-                },
-                y: {
-                    formatter: function(val) {
-                        return val.toFixed(0) + '%';
-                    }
-                }
-            },
-            markers: {
-                size: 4,
-                hover: {
-                    size: 6
-                }
-            },
-            responsive: [{
-                breakpoint: 768,
-                options: {
-                    chart: {
-                        height: 300
-                    },
-                    legend: {
-                        position: 'bottom',
-                        fontSize: '11px'
-                    }
-                }
-            }]
-        };
-        
-        // Create the chart instance
-        const chart = new ApexCharts(container, options);
-        chart.render();
-    } catch (error) {
-        console.error('Error rendering timeline chart:', error);
-        container.innerHTML = '<p class="error-message">Error rendering chart. Please try again later.</p>';
-    }
-}
-
-// Helper function to load ApexCharts if it's not already loaded
-function loadApexCharts(callback) {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
-    script.onload = callback;
-    document.head.appendChild(script);
-}
-
-// Helper function to dump page structure for debugging
-function dumpPageStructure() {
-    console.log('Page structure (first 1000 chars):', document.body.innerHTML.substring(0, 1000) + '...');
-}
-
-// Add showToast function since it's missing
-function showToast(message, type = 'info') {
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    
-    // Use existing showError for error messages
-    if (type === 'error') {
-        if (typeof showError === 'function') {
-            showError(message);
-            return;
-        }
-    }
-    
-    // For other types, use alert
-    alert(message);
-    // In a real implementation, this would show a styled toast message
-}
-
-// Add the missing function to avoid errors
-function setupRecurringPaymentForms() {
-    console.log('Setting up recurring payment forms');
-    
-    // Get the recurring payment form
-    const recurringPaymentForm = document.getElementById('recurring-payment-form');
-    if (!recurringPaymentForm) {
-        console.log('Recurring payment form not found');
-        return;
-    }
-    
-    // Add event listener for the form submission
-    recurringPaymentForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        
-        // Get form data
-        const formData = new FormData(recurringPaymentForm);
-        const goalId = formData.get('goal-id');
-        const amount = parseFloat(formData.get('amount'));
-        const frequency = formData.get('frequency');
-        
-        if (!goalId || isNaN(amount) || amount <= 0 || !frequency) {
-            showToast('Please fill out all fields correctly', 'error');
-            return;
-        }
-        
-        try {
-            // Create the recurring payment
-            await createRecurringPayment(goalId, amount, frequency);
-            
-            // Close the modal and show success message
-            const modal = document.getElementById('recurring-payment-modal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-            
-            showToast('Recurring payment set up successfully!', 'success');
-            
-            // Reload goals to show the updated data
-            await loadGoals();
-        } catch (error) {
-            console.error('Error setting up recurring payment:', error);
-            showToast('Failed to set up recurring payment', 'error');
-        }
-    });
-}
-
-// Also add a stub for setupSignOut if it's referenced
-function setupSignOut() {
-    console.log('Setting up sign out button');
-    const signOutButton = document.getElementById('sign-out-btn');
-    if (signOutButton) {
-        signOutButton.addEventListener('click', () => {
-            localStorage.removeItem('token');
-            window.location.href = '/login.html';
-        });
-    }
 } 

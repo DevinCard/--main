@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="../style/summaries.css" />
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js for balance over time chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <!-- Header -->
@@ -31,6 +33,7 @@
         <li><a href="../resource/goals.html">Goals</a></li>
         <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
         <li><a href="../resource/Categories.html">Categories</a></li>
+        <li><a href="../resource/faq.html">FAQ</a></li>
       </ul>
     </div>
 
@@ -53,13 +56,12 @@
         
         <!-- Timeframe controls -->
         <div class="timeframe-controls">
-          <button class="time-btn active" data-timeframe="1D">1D</button>
-          <button class="time-btn" data-timeframe="1W">1W</button>
-          <button class="time-btn" data-timeframe="1M">1M</button>
-          <button class="time-btn" data-timeframe="3M">3M</button>
-          <button class="time-btn" data-timeframe="6M">6M</button>
-          <button class="time-btn" data-timeframe="1Y">1Y</button>
-          <button class="time-btn" data-timeframe="All">All</button>
+          <button class="time-btn" data-timeframe="Daily">Daily</button>
+          <button class="time-btn" data-timeframe="Weekly">Weekly</button>
+          <button class="time-btn" data-timeframe="Monthly">Monthly</button>
+          <button class="time-btn active" data-timeframe="3M">3 Months</button>
+          <button class="time-btn" data-timeframe="6M">6 Months</button>
+          <button class="time-btn" data-timeframe="YTD">YTD</button>
         </div>
         
         <div class="summary-content">

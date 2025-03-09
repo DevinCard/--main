@@ -171,16 +171,122 @@ body {
     min-height: 400px;
 }
 
-/* Transaction item styling */
+/* Transaction Item Styling */
 .transaction-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 12px 15px;
-    margin-bottom: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
     background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.transaction-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.transaction-date {
+    min-width: 100px;
+    padding-right: 15px;
+}
+
+.date {
+    font-weight: 600;
+    color: #333;
+}
+
+.frequency {
+    font-size: 12px;
+    color: #666;
+}
+
+.transaction-details {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.transaction-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.transaction-category {
+    font-size: 12px;
+    color: #666;
+}
+
+.category-emoji {
+    margin-right: 4px;
+    font-size: 16px;
+}
+
+.transaction-amount {
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0 15px;
+}
+
+.amount-positive {
+    color: #2ecc71;
+}
+
+.amount-negative {
+    color: #e74c3c;
+}
+
+.next-occurrence {
+    min-width: 110px;
+    text-align: right;
+    padding: 0 15px;
+}
+
+.next-date {
+    font-size: 13px;
+    color: #333;
+}
+
+.days-until {
+    font-size: 12px;
+    color: #666;
+}
+
+.upcoming-soon .days-until {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.upcoming .days-until {
+    color: #f39c12;
+}
+
+.transaction-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.transaction-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.2s;
+    font-size: 14px;
+}
+
+.edit-btn:hover {
+    color: #3498db;
+}
+
+.delete-btn:hover {
+    color: #e74c3c;
+}
+
+.goal-deposit {
+    border-left: 3px solid #78a864;
 }
 
 /* Transaction info section */

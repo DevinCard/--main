@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recurring Purchases</title>
     <link rel="stylesheet" href="../style/Rpurchases.css" />
+    <!-- Chart.js for balance projection chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <!-- Header -->
@@ -27,6 +29,7 @@
           <a href="../resource/Rpurchases.html" class="active">Reoccurring Purchases</a>
         </li>
         <li><a href="../resource/Categories.html">Categories</a></li>
+        <li><a href="../resource/faq.html">FAQ</a></li>
       </ul>
     </div>
 
@@ -53,10 +56,12 @@
         <div class="bottom-right">
           <h2 class="section-title">Projected Budget Graph</h2>
           <div class="range-selector">
+            <button class="range-btn" data-months="0.033">Daily</button>
+            <button class="range-btn" data-months="0.25">Weekly</button>
+            <button class="range-btn" data-months="1">Monthly</button>
             <button class="range-btn active" data-months="3">3 Months</button>
             <button class="range-btn" data-months="6">6 Months</button>
-            <button class="range-btn" data-months="12">1 Year</button>
-            <button class="range-btn" data-months="24">2 Years</button>
+            <button class="range-btn" data-months="ytd">YTD</button>
           </div>
           <div class="graph-container">
             <div id="projectedBudgetChart"></div>
