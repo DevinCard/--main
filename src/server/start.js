@@ -1,23 +1,17 @@
-// Secure server startup script that sets OpenAI API key as environment variable
+// Secure server startup script
 const { spawn } = require('child_process');
 const path = require('path');
 
-// IMPORTANT: In production, use a proper .env file or environment variables management
-// This is only for development purposes - NEVER store API keys in code in production
-const OPENAI_API_KEY = "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";
-
-// Start the server with environment variable
 const serverProcess = spawn('node', ['index.js'], {
   env: {
-    ...process.env,
-    OPENAI_API_KEY: OPENAI_API_KEY
+    ...process.env
   },
   stdio: 'inherit',
   cwd: path.join(__dirname)
 });
 
 // Log server status
-console.log('Starting Vaultly server with AI assistant capability...');
+console.log('Starting Vaultly server...');
 
 // Handle server process events
 serverProcess.on('error', (error) => {
