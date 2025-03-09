@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vaultly Login</title>
+    <link rel="stylesheet" href="../style/login.css" />
+    <style>
+      .text-logo a {
+        text-decoration: none; /* Remove underlining */
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <!-- Vaultly Logo (PNG) and Text as Links -->
+      <div class="logo">
+        <a href="../../index.html">
+          <img src="../images/2237920.png" alt="Vaultly Logo" />
+        </a>
+      </div>
+      <div class="text-logo">
+        <a href="../../index.html" style="color: #78a864">Vaultly</a>
+      </div>
+      <!-- Sign Up Button -->
+      <div class="auth-buttons">
+        <button
+          class="signup-btn"
+          onclick="window.location.href='signup.html';"
+        >
+          Sign Up
+        </button>
+      </div>
+    </header>
+
+    <section class="main-section">
+      <div class="login-box">
+        <h2>Vaultly Login</h2>
+        <form id="login-form">
+          <div class="wave-group">
+            <input type="email" id="login-email" placeholder="Email" required />
+            <span class="bar"></span>
+            <label class="label">
+              <span class="label-char" style="--index: 0">E</span>
+              <span class="label-char" style="--index: 1">m</span>
+              <span class="label-char" style="--index: 2">a</span>
+              <span class="label-char" style="--index: 3">i</span>
+              <span class="label-char" style="--index: 4">l</span>
+            </label>
+          </div>
+
+          <div class="wave-group">
+            <input type="password" id="login-password" placeholder="Password" required />
+            <span class="bar"></span>
+            <label class="label">
+              <span class="label-char" style="--index: 0">P</span>
+              <span class="label-char" style="--index: 1">a</span>
+              <span class="label-char" style="--index: 2">s</span>
+              <span class="label-char" style="--index: 3">s</span>
+              <span class="label-char" style="--index: 4">w</span>
+              <span class="label-char" style="--index: 5">o</span>
+              <span class="label-char" style="--index: 6">r</span>
+              <span class="label-char" style="--index: 7">d</span>
+            </label>
+          </div>
+
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </section>
+
+    <script src="../js/login.js"></script>
+  </body>
+</html>

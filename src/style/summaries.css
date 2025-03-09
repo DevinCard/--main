@@ -1,0 +1,354 @@
+/* General Reset */
+body, h1, h2, h3, button, ul, li, a, div, span {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+/* Centered Title with Logo */
+.title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #78a864;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Sign-Out Button */
+.signout-btn {
+    background-color: #9ad97f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.signout-btn:hover {
+    background-color: #86c76e;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    height: calc(100vh - 70px);
+    background-color: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    z-index: 900;
+    overflow-y: auto;
+    padding-top: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    margin: 15px 0;
+}
+
+.sidebar-menu a {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    padding: 10px 20px;
+    display: block;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.sidebar-menu a.active,
+.sidebar-menu a:hover {
+    background-color: #9ad97f;
+    color: white;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    margin-top: 80px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* SumChart Box */
+.sumchart-box {
+    background-color: #78a864;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 300px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.sumchart-box h2 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+#transaction-chart {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Summary Box */
+.summary-box {
+    background-color: #78a864;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    min-height: 500px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+.summary-header h2 {
+    color: white;
+    font-size: 22px;
+}
+
+.export-btn {
+    background-color: white;
+    color: #78a864;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+    font-weight: 600;
+}
+
+.export-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* Timeframe Controls */
+.timeframe-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.time-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+    color: white;
+}
+
+.time-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.time-btn.active {
+    background-color: white;
+    color: #78a864;
+}
+
+/* Summary Content */
+.summary-content {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+}
+
+.summary-section {
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.summary-section h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.transaction-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 350px;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: white;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-item:last-child {
+    margin-bottom: 0;
+}
+
+.category-info {
+    display: flex;
+    align-items: center;
+}
+
+.category-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+}
+
+.transaction-amount {
+    font-weight: 600;
+    color: #333;
+}
+
+.transaction-amount.deposit {
+    color: #4caf50;
+}
+
+.transaction-amount.withdrawal {
+    color: #f44336;
+}
+
+.transaction-amount .percentage {
+    font-size: 12px;
+    color: #888;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: white;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.total-label {
+    color: #333;
+}
+
+.total-amount {
+    font-size: 18px;
+}
+
+#total-deposits {
+    color: #4caf50;
+}
+
+#total-withdrawals {
+    color: #f44336;
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .summary-content {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transactions</title>
+    <link rel="stylesheet" href="../style/transaction.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Vaultly Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn" id="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li>
+          <a href="../resource/transaction.html" class="active">Transactions</a>
+        </li>
+        <li><a href="../resource/summaries.html">Available Summaries</a></li>
+        <li><a href="../resource/goals.html">Goals</a></li>
+        <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
+        <li><a href="../resource/Categories.html">Categories</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="transaction-list">
+        <div class="transaction-box longer-box">
+          <div class="search-filter-container">
+            <input type="text" id="transaction-search" placeholder="Search transactions..." oninput="filterTransactions()">
+            <select id="category-filter" onchange="filterTransactions()">
+              <option value="">All Categories</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Custom">Custom</option>
+            </select>
+          </div>
+          <div id="transaction-display"></div>
+          <button class="new-transaction-btn" id="new-transaction-btn">New Transaction</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transaction-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="modal-title">New Transaction</h3>
+        <form id="transaction-form">
+          <div class="wave-group">
+            <select id="transaction-type" required>
+              <option value="Deposit">Deposit</option>
+              <option value="Withdrawal">Withdrawal</option>
+            </select>
+            <span class="bar"></span>
+          </div>
+
+          <div class="wave-group">
+            <input type="text" id="transaction-title" placeholder="Title" required>
+            <span class="bar"></span>
+          </div>
+
+          <div class="wave-group">
+            <input type="date" 
+                   id="transaction-date" 
+                   required 
+                   min="2020-01-01">
+            <span class="bar"></span>
+          </div>
+
+          <div class="wave-group">
+            <select id="transaction-category" required>
+              <option value="Food">🍔 Food</option>
+              <option value="Transport">🚌 Transport</option>
+              <option value="Utilities">💡 Utilities</option>
+              <option value="Custom">➕ Add Custom Category</option>
+            </select>
+            <span class="bar"></span>
+          </div>
+
+          <div id="custom-category-group" class="wave-group hidden">
+            <div class="custom-category-inputs">
+              <input type="text" id="custom-category-name" placeholder="Category Name">
+              <input type="text" id="custom-emoji" placeholder="Enter Emoji">
+            </div>
+            <span class="bar"></span>
+          </div>
+
+          <div class="wave-group">
+            <input type="number" id="transaction-amount" placeholder="Amount" required>
+            <span class="bar"></span>
+          </div>
+
+          <div class="wave-group">
+            <select id="transaction-recurring" required>
+                <option value="one-time">One-time</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="custom">Custom</option>
+            </select>
+            <span class="bar"></span>
+          </div>
+
+          <div id="custom-recurring-group" class="wave-group hidden">
+            <div class="custom-recurring-inputs">
+                <input type="number" id="recurring-interval" placeholder="Interval" min="1">
+                <select id="recurring-unit">
+                    <option value="days">Days</option>
+                    <option value="weeks">Weeks</option>
+                    <option value="months">Months</option>
+                    <option value="years">Years</option>
+                </select>
+            </div>
+            <span class="bar"></span>
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="close-btn" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="submit-btn">Save</button>
+            <button type="button" id="delete-transaction-btn" class="delete-btn hidden">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/newtransaction.js"></script>
+  </body>
+</html>

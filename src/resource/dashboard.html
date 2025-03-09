@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Layout</title>
+    <link rel="stylesheet" href="../style/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Recurring Payment Items */
+        .recurring-payments-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        .recurring-payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f7f9fc;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .recurring-payment-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        
+        .recurring-payment-item.upcoming {
+            border-left: 3px solid #f39c12;
+        }
+        
+        .recurring-payment-item.upcoming-soon {
+            border-left: 3px solid #e74c3c;
+        }
+        
+        .payment-details {
+            flex: 1;
+        }
+        
+        .payment-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .payment-frequency {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .payment-amount {
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 0 15px;
+        }
+        
+        .payment-date {
+            text-align: right;
+            min-width: 100px;
+        }
+        
+        .next-date {
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .days-until {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .upcoming-soon .days-until {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .no-data-message, .error-message, .loading-message {
+            text-align: center;
+            padding: 20px 0;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="#" class="active">Dashboard</a></li>
+        <li><a href="../resource/transaction.html">Transactions</a></li>
+        <li><a href="../resource/summaries.html">Available Summaries</a></li>
+        <li><a href="../resource/goals.html">Goals</a></li>
+        <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
+        <li><a href="../resource/Categories.html">Categories</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Rectangle -->
+      <div class="dash-info dash-info-top">
+        <!-- Balance Bubble -->
+        <div class="balance-bubble">
+          <span class="balance-amount">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Bottom Two Rectangles -->
+      <div class="bottom-containers">
+        <div class="dash-info dash-info-bottom">
+          <h2 class="section-title">Recurring Payments</h2>
+          <div class="recurring-payments-container">
+            <p class="loading-message">Loading recurring payments...</p>
+          </div>
+        </div>
+        <div class="dash-info dash-info-bottom">
+          <h2 class="section-title">Categories</h2>
+          <div id="category-rankings"></div>
+          <div class="timeframe-controls">
+            <button class="time-btn active" data-timeframe="day">Today</button>
+            <button class="time-btn" data-timeframe="week">This Week</button>
+            <button class="time-btn" data-timeframe="month">This Month</button>
+            <button class="time-btn" data-timeframe="3month">3 Months</button>
+            <button class="time-btn" data-timeframe="ytd">YTD</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+  </body>
+</html>

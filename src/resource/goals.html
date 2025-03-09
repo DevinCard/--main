@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self';">
+    <title>Goals - Vaultly</title>
+    <link rel="stylesheet" href="../style/goals.css" />
+    <style>
+      /* Fix for ApexCharts container */
+      .multi-goal-box {
+        padding: 20px;
+        margin-bottom: 30px;
+        background: #78a864;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      .multi-goal-box h2 {
+        color: white;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+      
+      .goals-timeline-section {
+        margin-bottom: 30px;
+      }
+      
+      #goalsTimelineChart {
+        min-height: 350px;
+        width: 100%;
+        margin: 20px 0;
+        position: relative;
+        z-index: 1;
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      
+      .apexcharts-canvas {
+        margin: 0 auto !important;
+        display: block !important;
+        position: relative !important;
+        z-index: 5;
+      }
+      
+      .timeline-controls {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: center;
+      }
+      
+      .timeline-buttons {
+        display: flex;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 25px;
+        padding: 5px;
+      }
+      
+      .time-btn {
+        background: none;
+        border: none;
+        padding: 8px 16px;
+        color: white;
+        font-size: 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .time-btn:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      
+      .time-btn.active {
+        background-color: white;
+        color: #78a864;
+      }
+      
+      .no-recurring-goals {
+        padding: 30px;
+        text-align: center;
+        background-color: white;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      
+      /* Your Goals section styling fixes */
+      .your-goals-box {
+        background: #78a864;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      .your-goals-box h2 {
+        color: white;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      
+      .new-goal-btn {
+        background-color: white;
+        color: #78a864;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: block;
+        margin: 20px auto 0;
+        transition: all 0.3s ease;
+      }
+      
+      .new-goal-btn:hover {
+        background-color: #f0f0f0;
+        transform: translateY(-2px);
+      }
+      
+      .goal-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        min-width: 250px;
+        transition: transform 0.3s ease;
+      }
+      
+      .goal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Error message styling */
+      .error-message {
+        background-color: #fff3f3;
+        color: #e74c3c;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Vaultly Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="../resource/transaction.html">Transactions</a></li>
+        <li><a href="../resource/summaries.html">Available Summaries</a></li>
+        <li><a href="../resource/goals.html" class="active">Goals</a></li>
+        <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
+        <li><a href="../resource/Categories.html">Categories</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Multi-goal timeline box -->
+      <div class="multi-goal-box">
+        <h2>Goals Timeline</h2>
+        <div class="timeline-controls">
+          <div class="timeline-buttons">
+            <button class="time-btn active" data-timeframe="month">1 Month</button>
+            <button class="time-btn" data-timeframe="quarter">3 Months</button>
+            <button class="time-btn" data-timeframe="year">1 Year</button>
+          </div>
+        </div>
+        <div id="goalsTimelineChart"></div>
+      </div>
+
+      <!-- Your goals section -->
+      <div class="your-goals-box">
+        <h2>Your Goals</h2>
+        <div class="goals-container">
+          <!-- Goals will be populated here by JavaScript -->
+        </div>
+        <button class="new-goal-btn" onclick="openNewGoalModal()">+ New Goal</button>
+      </div>
+
+      <!-- Modals go here -->
+      <div class="modal" id="newGoalModal">
+        <div class="modal-content">
+          <span class="close" onclick="document.getElementById('newGoalModal').style.display='none'">&times;</span>
+          <h2>New Goal</h2>
+          <form id="newGoalForm">
+            <div class="form-group">
+              <label for="goal-title-input">Title</label>
+              <input type="text" id="goal-title-input" name="title" required>
+            </div>
+            <div class="form-group">
+              <label for="goal-amount-input">Target Amount</label>
+              <input type="number" id="goal-amount-input" name="targetAmount" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="goal-category-select">Category</label>
+              <select id="goal-category-select" name="category" required>
+                <!-- Categories will be populated by JavaScript -->
+              </select>
+            </div>
+            <div id="goal-custom-category-group" class="form-group hidden">
+              <div class="custom-category-inputs">
+                <div class="form-group">
+                  <label for="goal-custom-category-name">Category Name</label>
+                  <input type="text" id="goal-custom-category-name" name="customCategoryName" placeholder="Category Name">
+                </div>
+                <div class="form-group">
+                  <label for="goal-custom-category-emoji">Emoji</label>
+                  <input type="text" id="goal-custom-category-emoji" name="customEmoji" placeholder="Enter Emoji">
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn">Create Goal</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Add Money Modal -->
+      <div class="modal" id="addMoneyModal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2>Add Money to Goal</h2>
+          <form id="addMoneyForm">
+            <input type="hidden" id="add-money-goal-id" name="goalId">
+            <div class="form-group">
+              <label for="add-money-amount">Amount</label>
+              <input type="number" id="add-money-amount" name="amount" min="0" step="0.01" required onclick="this.focus();" style="z-index: 1001; position: relative;">
+            </div>
+            <div class="form-group">
+              <label for="add-money-interval">Recurring Payment?</label>
+              <select id="add-money-interval" name="recurring" style="z-index: 1001; position: relative;">
+                <option value="one-time">One-time Payment</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+            <button type="submit" class="submit-btn">Add Money</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/goals.js"></script>
+  </body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Categories</title>
+    <link rel="stylesheet" href="../style/categories.css" />
+    <style>
+        /* Spend Circles Styling */
+        .spend-circle {
+            margin: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .spend-circle:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .spend-circle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+        
+        .category-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        
+        .category-emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .category-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .progress-circle-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .progress-ring-circle.good {
+            stroke: #2ecc71;
+        }
+        
+        .progress-ring-circle.warning {
+            stroke: #f39c12;
+        }
+        
+        .progress-ring-circle.danger {
+            stroke: #e74c3c;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+        }
+        
+        .progress-text .percentage {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .progress-text .amount {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Budget Items Styling */
+        .category-budget-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .budget-category {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .budget-amount {
+            font-weight: bold;
+            margin: 0 15px;
+        }
+        
+        .budget-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+            color: #555;
+            transition: color 0.2s;
+        }
+        
+        .edit-budget-btn:hover {
+            color: #3498db;
+        }
+        
+        .delete-budget-btn:hover {
+            color: #e74c3c;
+        }
+        
+        #category-spend-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        
+        /* Horizontal Spend Circle Styling - Similar to Goal Layout */
+        .spend-circle-horizontal {
+            margin: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .spend-circle-horizontal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .spend-circle-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 10px;
+            gap: 20px;
+        }
+        
+        .circle-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+        
+        .category-emoji-background {
+            position: absolute;
+            font-size: 40px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
+        .progress-ring {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        .category-info-horizontal {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        
+        .category-info-horizontal .category-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .category-info-horizontal .spend-amount {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Color states */
+        .spend-circle-row.good .progress-ring-circle {
+            stroke: #2ecc71;
+        }
+        
+        .spend-circle-row.warning .progress-ring-circle {
+            stroke: #f39c12;
+        }
+        
+        .spend-circle-row.danger .progress-ring-circle {
+            stroke: #e74c3c;
+        }
+        
+        /* Custom container styling */
+        #category-spend-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Section header styling */
+        .spend-section-header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .spend-section-header h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .section-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-top: 0;
+        }
+
+        /* Container for spend circles */
+        .spend-circles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            gap: 15px;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Vaultly Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="../resource/transaction.html">Transactions</a></li>
+        <li><a href="../resource/summaries.html">Available Summaries</a></li>
+        <li><a href="../resource/goals.html">Goals</a></li>
+        <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
+        <li>
+          <a href="../resource/Categories.html" class="active">Categories</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Section -->
+      <div class="top-section">
+        <div class="category-box top-left">
+          <div class="box-content">
+            <h2 class="box-title">Category Budget</h2>
+            <div id="category-budget-container" class="content-container">
+              <!-- Budgets will be displayed here -->
+              <p class="no-data-message">No budgets set. Use the button below to set your first category budget.</p>
+            </div>
+            <button id="set-budget-btn" class="action-button">Set Budget</button>
+          </div>
+        </div>
+        <div class="category-box top-right">
+          <div class="box-content">
+            <h2 class="box-title">Top Categories</h2>
+            <div id="category-rankings" class="content-container">
+              <!-- Top categories will be displayed here -->
+            </div>
+            <div class="timeframe-controls">
+              <button class="time-btn active" data-timeframe="day">Today</button>
+              <button class="time-btn" data-timeframe="week">This Week</button>
+              <button class="time-btn" data-timeframe="month">This Month</button>
+              <button class="time-btn" data-timeframe="3month">3 Months</button>
+              <button class="time-btn" data-timeframe="ytd">YTD</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Section -->
+      <div class="bottom-section">
+        <div class="category-box bottom-left">
+          <div class="box-content">
+            <h2 class="box-title">Current Spend</h2>
+            <div class="timeframe-controls" id="spend-timeframe-controls">
+                <button class="timeframe-button" data-timeframe="week">This Week</button>
+                <button class="timeframe-button active" data-timeframe="month">This Month</button>
+                <button class="timeframe-button" data-timeframe="quarter">This Quarter</button>
+                <button class="timeframe-button" data-timeframe="year">This Year</button>
+            </div>
+            <div id="category-spend-container" class="content-container">
+              <!-- Current spend with progress circles will be displayed here -->
+              <p class="no-data-message">No category spend data available.</p>
+            </div>
+          </div>
+        </div>
+        <div class="category-box bottom-right">
+          <div class="box-content">
+            <h2 class="box-title">Active Categories</h2>
+            <div id="active-categories-container" class="content-container">
+              <!-- Active categories will be displayed here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for setting category budget -->
+    <div id="budget-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Set Category Budget</h2>
+        <form id="budget-form">
+          <div class="form-group">
+            <label for="category-select">Category</label>
+            <select id="category-select" required>
+              <!-- Categories will be populated here -->
+              <option value="Custom">➕ Add Custom Category</option>
+            </select>
+          </div>
+          
+          <!-- Custom category input fields -->
+          <div id="custom-category-group" class="form-group hidden">
+            <div class="custom-category-inputs">
+              <label for="custom-category-name">Category Name</label>
+              <input type="text" id="custom-category-name" placeholder="Category Name">
+              <label for="custom-emoji">Emoji</label>
+              <input type="text" id="custom-emoji" placeholder="Enter Emoji">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="budget-amount">Monthly Budget</label>
+            <input type="number" id="budget-amount" min="1" step="0.01" required placeholder="Enter amount">
+          </div>
+          <button type="submit" class="submit-btn">Save Budget</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="../js/api.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/categories.js"></script>
+  </body>
+</html>

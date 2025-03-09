@@ -1,0 +1,496 @@
+/* General Reset */
+body, h1, button, ul, li, a, div {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9f9f9;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure the header is always on top */
+}
+
+/* Centered Title with Logo */
+.title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #78a864;
+    text-align: center;
+}
+
+/* Sign-Out Button */
+.signout-btn {
+    background-color: #9ad97f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.signout-btn:hover {
+    background-color: #86c76e;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    height: calc(100vh - 70px);
+    background-color: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    position: fixed;
+    top: 70px; /* Aligns the sidebar below the header */
+    left: 0;
+    z-index: 900; /* Ensures it stays below the header */
+    overflow-y: auto;
+    padding-top: 20px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    margin: 15px 0;
+}
+
+.sidebar-menu a {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    padding: 10px 20px;
+    display: block;
+    border-radius: 5px;
+}
+
+.sidebar-menu a.active,
+.sidebar-menu a:hover {
+    background-color: #9ad97f;
+    color: white;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    margin-top: 80px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section-title {
+    color: white;
+    font-size: 24px;
+    margin: 20px 0;
+    padding: 0 15px;
+    text-align: center;
+}
+
+.top-box, .bottom-left, .bottom-right {
+    position: relative;
+    padding-top: 10px;
+}
+
+.top-box {
+    background-color: #78a864;
+    border-radius: 10px;
+    min-height: 300px;
+    padding: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-sections {
+    display: flex;
+    gap: 20px;
+    height: 600px;
+    margin-bottom: 20px;
+}
+
+.bottom-left, .bottom-right {
+    background-color: #78a864;
+    border-radius: 10px;
+    flex: 1;
+    padding: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-height: 600px;
+}
+
+.upcoming-purchases-container,
+.previous-purchases-container {
+    padding: 20px;
+    overflow-y: auto;
+    height: calc(100% - 64px);
+    max-height: none;
+}
+
+.graph-container {
+    padding: 20px;
+    height: calc(100% - 100px);
+    background-color: white;
+    margin: 0 20px 20px;
+    border-radius: 10px;
+    min-height: 450px;
+}
+
+#projectedBudgetChart {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+}
+
+/* Transaction item styling */
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Transaction info section */
+.transaction-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Transaction title */
+.transaction-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+/* Transaction date */
+.transaction-date {
+    font-size: 13px;
+    color: #777;
+}
+
+/* Days until next payment */
+.days-until {
+    margin-right: 15px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Transaction amount styling */
+.transaction-amount {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Specific transaction type colors */
+.withdrawal-amount {
+    color: #e74c3c; /* Red for withdrawals */
+}
+
+.deposit-amount {
+    color: #2ecc71; /* Green for deposits */
+}
+
+.goal-contribution-amount {
+    color: #9b59b6; /* Purple for goal contributions */
+}
+
+/* Transaction types */
+.Withdrawal {
+    color: #e74c3c;
+}
+
+.Deposit {
+    color: #2ecc71;
+}
+
+/* Goal contribution styling */
+.goal-contribution .transaction-title {
+    color: #8e44ad;
+}
+
+.goal-contribution {
+    border-left: 3px solid #9b59b6;
+}
+
+.range-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 20px;
+    padding: 10px 0;
+}
+
+.range-btn {
+    background-color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #78a864;
+    transition: all 0.3s ease;
+}
+
+.range-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.range-btn.active {
+    background-color: #78a864;
+    color: white;
+}
+
+/* Add goal contribution styling */
+.transaction-item.goal-contribution {
+    background-color: #f0f8ff; /* Light blue background */
+    border-left: 4px solid #4caf50; /* Green border */
+}
+
+.goal-indicator {
+    display: block;
+    font-size: 0.9rem;
+    color: #4caf50;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Chart Section Styles */
+.chart-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-section h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.chart-container {
+    height: 350px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.chart-description {
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.timeframe-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.timeframe-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 12px;
+    transition: all 0.3s;
+}
+
+.timeframe-button:hover {
+    background-color: #e5e5e5;
+}
+
+.timeframe-button.active {
+    background-color: #78a864;
+    border-color: #78a864;
+    color: white;
+}
+
+/* Add styles for goal contributions */
+#goal-contributions-header h3,
+#regular-expenses-header h3 {
+  margin: 15px 0 5px;
+  font-size: 16px;
+  color: #444;
+  padding-left: 10px;
+  border-left: 3px solid #78a864;
+}
+
+#goal-contributions {
+  margin-bottom: 20px;
+}
+
+.contribution-container {
+  margin-bottom: 15px;
+}
+
+.recurring-payment .payment-amount.goal {
+  color: #6649ae; /* Purple color for goal contributions */
+  font-weight: 600;
+}
+
+/* Style the existing classes for better visual hierarchy */
+.recurring-payment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: white;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.recurring-payment:hover {
+  background-color: #f9f9f9;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+.payment-category {
+  font-size: 13px;
+  color: #666;
+  margin-top: 3px;
+}
+
+.payment-frequency {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.payment-amount {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.payment-amount.expense {
+  color: #e74c3c;
+}
+
+.payment-amount.income {
+  color: #2ecc71;
+}
+
+/* Add styles for the recurring payments section */
+.recurring-payments-section {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.recurring-payments-section h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 20px;
+  border-bottom: 2px solid #78a864;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.payments-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.income-section, .expenses-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.payment-list {
+  margin-top: 10px;
+}
+
+/* Financial summary styles */
+.financial-summary {
+  margin-top: 25px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border-left: 4px solid #78a864;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 5px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+  font-weight: 600;
+}
+
+.summary-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.summary-value {
+  font-weight: 600;
+}
+
+.summary-value.income {
+  color: #2ecc71;
+}
+
+.summary-value.expense {
+  color: #e74c3c;
+}

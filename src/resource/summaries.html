@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Summaries</title>
+    <link rel="stylesheet" href="../style/summaries.css" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Vaultly Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="../resource/transaction.html">Transactions</a></li>
+        <li>
+          <a href="../resource/summaries.html" class="active"
+            >Available Summaries</a
+          >
+        </li>
+        <li><a href="../resource/goals.html">Goals</a></li>
+        <li><a href="../resource/Rpurchases.html">Reoccurring Purchases</a></li>
+        <li><a href="../resource/Categories.html">Categories</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- SumChart Box - For graphs or charts -->
+      <div class="sumchart-box">
+        <h2>Transaction Overview</h2>
+        <div id="transaction-chart"></div>
+      </div>
+
+      <!-- Summary Report Box -->
+      <div class="summary-box">
+        <div class="summary-header">
+          <h2>Summary Report</h2>
+          <button id="export-pdf" class="export-btn">
+            <i class="fas fa-file-pdf"></i> Export as PDF
+          </button>
+        </div>
+        
+        <!-- Timeframe controls -->
+        <div class="timeframe-controls">
+          <button class="time-btn active" data-timeframe="1D">1D</button>
+          <button class="time-btn" data-timeframe="1W">1W</button>
+          <button class="time-btn" data-timeframe="1M">1M</button>
+          <button class="time-btn" data-timeframe="3M">3M</button>
+          <button class="time-btn" data-timeframe="6M">6M</button>
+          <button class="time-btn" data-timeframe="1Y">1Y</button>
+          <button class="time-btn" data-timeframe="All">All</button>
+        </div>
+        
+        <div class="summary-content">
+          <!-- Deposits Section -->
+          <div class="summary-section">
+            <h3>Deposits by Category</h3>
+            <div id="deposits-list" class="transaction-list">
+              <!-- Will be populated by JavaScript -->
+              <div class="loading-indicator">Loading...</div>
+            </div>
+            <div class="total-row">
+              <span class="total-label">Total Deposits:</span>
+              <span id="total-deposits" class="total-amount">$0.00</span>
+            </div>
+          </div>
+          
+          <!-- Withdrawals Section -->
+          <div class="summary-section">
+            <h3>Withdrawals by Category</h3>
+            <div id="withdrawals-list" class="transaction-list">
+              <!-- Will be populated by JavaScript -->
+              <div class="loading-indicator">Loading...</div>
+            </div>
+            <div class="total-row">
+              <span class="total-label">Total Withdrawals:</span>
+              <span id="total-withdrawals" class="total-amount">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="../js/api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="../js/summaries.js"></script>
+  </body>
+</html>

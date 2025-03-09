@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recurring Purchases</title>
+    <link rel="stylesheet" href="../style/Rpurchases.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Vaultly Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn" id="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="../resource/transaction.html">Transactions</a></li>
+        <li><a href="../resource/summaries.html">Available Summaries</a></li>
+        <li><a href="../resource/goals.html">Goals</a></li>
+        <li>
+          <a href="../resource/Rpurchases.html" class="active">Reoccurring Purchases</a>
+        </li>
+        <li><a href="../resource/Categories.html">Categories</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h1>Recurring Purchases</h1>
+      
+      <!-- Upcoming Recurring Purchases -->
+      <div class="top-box">
+        <h2 class="section-title">Upcoming Recurring Purchases</h2>
+        <div class="upcoming-purchases-container">
+          <!-- Content will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Bottom Section -->
+      <div class="bottom-sections">
+        <div class="bottom-left">
+          <h2 class="section-title">Previous Recurring Purchases</h2>
+          <div class="previous-purchases-container">
+            <!-- Content will be populated by JavaScript -->
+          </div>
+        </div>
+        <div class="bottom-right">
+          <h2 class="section-title">Projected Budget Graph</h2>
+          <div class="range-selector">
+            <button class="range-btn active" data-months="3">3 Months</button>
+            <button class="range-btn" data-months="6">6 Months</button>
+            <button class="range-btn" data-months="12">1 Year</button>
+            <button class="range-btn" data-months="24">2 Years</button>
+          </div>
+          <div class="graph-container">
+            <div id="projectedBudgetChart"></div>
+          </div>
+          <p class="chart-description">This chart shows your projected account balance over time based on your recurring deposits and withdrawals.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/Rpurchases.js"></script>
+  </body>
+</html>

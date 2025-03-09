@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Transaction</title>
+    <link rel="stylesheet" href="../style/newtransactions.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn">Sign Out</button>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h2>Choose Transaction Type</h2>
+      <div class="transaction-type">
+        <button class="transaction-btn deposit-btn" onclick="showModal('deposit')">
+          Deposit
+        </button>
+        <button class="transaction-btn withdrawal-btn" onclick="showModal('withdrawal')">
+          Withdrawal
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="transaction-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="modal-title">Transaction Details</h3>
+        <form id="transaction-form">
+          <!-- Questions will be dynamically inserted here -->
+        </form>
+        <button class="close-btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+    <script src="../js/newtransaction.js"></script>
+  </body>
+</html>

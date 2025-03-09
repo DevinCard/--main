@@ -1,0 +1,172 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+/* General styling for the page */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #f4f4f4;
+  height: 100vh;
+}
+
+/* Header section */
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.text-logo {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #78a864;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo img {
+  height: 50px;
+}
+
+/* Authentication buttons */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+
+
+.auth-buttons .signup-btn {
+    background-color: #78a864;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: 100%;
+  }
+  
+  .auth-buttons .signup-btn:hover {
+    background-color: #9ad97f;
+  }
+/* Main section and login box */
+.main-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  margin-top: 80px;
+}
+
+.login-box {
+  background-color: #78a864;
+  padding: 40px;
+  border-radius: 15px;
+  width: 400px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: box-shadow 0.3s ease;
+}
+
+.login-box:hover {
+  box-shadow: 0px 0px 30px 1px rgba(120, 168, 100, 0.3);
+}
+
+.login-box h2 {
+  color: white;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+/* Input fields with wave effect */
+.login-box .wave-group {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.login-box .wave-group input {
+  font-size: 16px;
+  padding: 10px 10px 10px 5px;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #515151;
+  background: transparent;
+  color: white;
+  outline: none;
+}
+
+.login-box .wave-group .label {
+  color: #ddd;
+  font-size: 18px;
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  display: flex;
+}
+
+.login-box .wave-group .label-char {
+  transition: 0.2s ease all;
+  transition-delay: calc(var(--index) * 0.05s);
+}
+
+.login-box .wave-group input:focus ~ .label .label-char,
+.login-box .wave-group input:valid ~ .label .label-char {
+  transform: translateY(-20px);
+  font-size: 14px;
+  color: #9ad97f;
+}
+
+.login-box .wave-group .bar {
+  position: relative;
+  width: 100%;
+}
+
+.login-box .wave-group .bar:before,
+.login-box .wave-group .bar:after {
+  content: "";
+  height: 2px;
+  width: 0;
+  position: absolute;
+  background: #9ad97f;
+  bottom: 1px;
+  transition: 0.2s ease all;
+}
+
+.login-box .wave-group .bar:before {
+  left: 50%;
+}
+
+.login-box .wave-group .bar:after {
+  right: 50%;
+}
+
+.login-box .wave-group input:focus ~ .bar:before,
+.login-box .wave-group input:focus ~ .bar:after {
+  width: 50%;
+}
+
+/* Button styling */
+.login-box button {
+  width: 100%;
+  padding: 15px;
+  background-color: #9ad97f;
+  color: white;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+.login-box button:hover {
+  background-color: #78a864;
+}

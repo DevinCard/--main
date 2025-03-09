@@ -1,0 +1,236 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+/* General Styles */
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f4f4;
+    height: 100vh;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+}
+
+/* Vaultly Text Logo */
+.text-logo {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #78a864;
+    margin-left: 20px;
+}
+
+/* Fixed Logo Image */
+.logo img {
+    height: 50px;
+    width: auto;
+}
+
+/* Authentication Buttons */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: 20px;
+}
+
+.auth-buttons .signup-btn {
+    background-color: #78a864;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.auth-buttons .signup-btn:hover {
+    background-color: #9ad97f;
+}
+
+/* Main Section */
+.main-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    width: 100%;
+    margin-top: 80px;
+}
+
+/* Sign Up Form Rectangle */
+.login-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #78a864;
+    padding: 40px;
+    border-radius: 15px;
+    width: 500px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+.login-box form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group {
+    width: 100%;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wave-group {
+    position: relative;
+    width: 90%;
+    display: flex;
+    justify-content: center;
+}
+
+.wave-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid transparent;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    height: 45px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.wave-group input::placeholder {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    display: none;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    animation: slideDown 0.3s ease-out;
+    width: 90%;
+}
+
+.error-message.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Title inside the sign-up box */
+.login-box h2 {
+    color: white;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+}
+
+/* Input Fields */
+.login-box input {
+    width: 90%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"],
+.login-box input[type="email"] {
+    background-color: white;
+    color: #333;
+}
+
+/* Submit Button */
+.login-box button {
+    width: 90%;
+    padding: 12px 15px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    background-color: #9ad97f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-box button:hover {
+    background-color: #78a864;
+}
+
+.login-box input:invalid {
+    border: 2px solid red;
+}
+
+.login-box input:focus:invalid {
+    outline: none; 
+    box-shadow: 0 0 5px red;
+}
+
+#non-matching-passwords {
+    display: none;
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px #78a864, 0 0 10px #78a864, 0 0 15px #78a864;
+    }
+    50% {
+        box-shadow: 0 0 10px #78a864, 0 0 20px #78a864, 0 0 30px #78a864;
+    }
+    100% {
+        box-shadow: 0 0 5px #78a864, 0 0 10px #78a864, 0 0 15px #78a864;
+    }
+}
+
+button[type="submit"] {
+    width: 90%;
+    padding: 12px 15px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    background-color: #9ad97f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #78a864;
+}
