@@ -7,115 +7,117 @@
     <link rel="stylesheet" href="../style/dashboard.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Recurring Payment Items */
-        .recurring-payments-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px 0;
-        }
-        
-        .recurring-payment-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background-color: #f7f9fc;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .recurring-payment-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-        }
-        
-        .recurring-payment-item.upcoming {
-            border-left: 3px solid #f39c12;
-        }
-        
-        .recurring-payment-item.upcoming-soon {
-            border-left: 3px solid #e74c3c;
-        }
-        
-        .payment-details {
-            flex: 1;
-        }
-        
-        .payment-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        
-        .payment-frequency {
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .payment-amount {
-            font-weight: bold;
-            color: #e74c3c;
-            padding: 0 15px;
-        }
-        
-        .payment-date {
-            text-align: right;
-            min-width: 100px;
-        }
-        
-        .next-date {
-            font-size: 13px;
-            color: #333;
-        }
-        
-        .days-until {
-            font-size: 12px;
-            color: #666;
-            margin-top: 4px;
-        }
-        
-        .upcoming-soon .days-until {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        
-        .no-data-message, .error-message, .loading-message {
-            text-align: center;
-            padding: 20px 0;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .error-message {
-            color: #e74c3c;
-        }
+      /* Recurring Payment Items */
+      .recurring-payments-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 10px 0;
+      }
 
-        /* Add this to the existing styles */
-        .see-all-button {
-            display: block;
-            margin: 15px auto 5px;
-            padding: 8px 15px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #555;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s;
-        }
-        
-        .see-all-button:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-2px);
-        }
-        
-        .see-all-button:active {
-            transform: translateY(0);
-        }
+      .recurring-payment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        background-color: #f7f9fc;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .recurring-payment-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+      }
+
+      .recurring-payment-item.upcoming {
+        border-left: 3px solid #f39c12;
+      }
+
+      .recurring-payment-item.upcoming-soon {
+        border-left: 3px solid #e74c3c;
+      }
+
+      .payment-details {
+        flex: 1;
+      }
+
+      .payment-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .payment-frequency {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .payment-amount {
+        font-weight: bold;
+        color: #e74c3c;
+        padding: 0 15px;
+      }
+
+      .payment-date {
+        text-align: right;
+        min-width: 100px;
+      }
+
+      .next-date {
+        font-size: 13px;
+        color: #333;
+      }
+
+      .days-until {
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .upcoming-soon .days-until {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .no-data-message,
+      .error-message,
+      .loading-message {
+        text-align: center;
+        padding: 20px 0;
+        color: #666;
+        font-style: italic;
+      }
+
+      .error-message {
+        color: #e74c3c;
+      }
+
+      /* Add this to the existing styles */
+      .see-all-button {
+        display: block;
+        margin: 15px auto 5px;
+        padding: 8px 15px;
+        background-color: #f0f0f0;
+        border: none;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #555;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.2s;
+      }
+
+      .see-all-button:hover {
+        background-color: #e0e0e0;
+        transform: translateY(-2px);
+      }
+
+      .see-all-button:active {
+        transform: translateY(0);
+      }
     </style>
   </head>
   <body>
@@ -165,7 +167,9 @@
           <div class="timeframe-controls">
             <button class="time-btn" data-timeframe="Daily">Daily</button>
             <button class="time-btn" data-timeframe="Weekly">Weekly</button>
-            <button class="time-btn active" data-timeframe="Monthly">Monthly</button>
+            <button class="time-btn active" data-timeframe="Monthly">
+              Monthly
+            </button>
             <button class="time-btn" data-timeframe="3M">3 Months</button>
             <button class="time-btn" data-timeframe="6M">6 Months</button>
             <button class="time-btn" data-timeframe="YTD">YTD</button>

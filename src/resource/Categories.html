@@ -6,551 +6,60 @@
     <title>Categories</title>
     <link rel="stylesheet" href="../style/categories.css" />
     <style>
-      /* Keep only the original styles and remove our custom styles */
-      /* Spend Circles Styling */
-      .spend-circle {
-          margin: 15px;
-          padding: 15px;
-          background-color: #fff;
-          border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
-      }
-      
-      .spend-circle:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-      }
-      
-      .spend-circle-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 10px;
-      }
-      
-      .category-info {
-          display: flex;
-          align-items: center;
-          margin-bottom: 10px;
-          width: 100%;
-      }
-      
-      .category-emoji {
-          font-size: 24px;
-          margin-right: 10px;
-      }
-      
-      .category-name {
-          font-size: 18px;
-          font-weight: 600;
-          color: #333;
-      }
-      
-      .progress-circle-container {
-          position: relative;
-          width: 120px;
-          height: 120px;
-      }
-      
-      .progress-ring-circle.good {
-          stroke: #2ecc71;
-      }
-      
-      .progress-ring-circle.warning {
-          stroke: #f39c12;
-      }
-      
-      .progress-ring-circle.danger {
-          stroke: #e74c3c;
-      }
-      
-      .progress-text {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          text-align: center;
-          width: 100%;
-      }
-      
-      .progress-text .percentage {
-          font-size: 24px;
-          font-weight: bold;
-          color: #333;
-      }
-      
-      .progress-text .amount {
-          font-size: 14px;
-          color: #666;
-      }
-      
-      /* Budget Items Styling */
+      /* Fix for Category Budget Layout */
       .category-budget-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 15px;
-          margin: 10px 0;
-          background-color: #fff;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px;
+        margin: 10px 0;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
-      
+
       .budget-category {
-          display: flex;
-          align-items: center;
-          flex: 1;
+        display: flex;
+        align-items: center;
+        flex: 2; /* Takes more space */
+        gap: 10px;
       }
-      
+
       .budget-amount {
-          font-weight: bold;
-          margin: 0 15px;
+        flex: 1;
+        font-weight: bold;
+        text-align: left; /* Aligns text left */
       }
-      
+
+      .budget-period {
+        flex: 1;
+        color: white;
+        font-size: 14px;
+        text-align: left;
+      }
+
+      .budget-actions {
+        display: flex;
+        flex: 0.5; /* Reduces space */
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
       .budget-actions button {
-          background: none;
-          border: none;
-          cursor: pointer;
-          margin-left: 10px;
-          color: #555;
-          transition: color 0.2s;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: black;
+        font-size: 14px;
+        transition: color 0.2s;
       }
-      
+
       .edit-budget-btn:hover {
-          color: #3498db;
+        color: #3498db;
       }
-      
+
       .delete-budget-btn:hover {
-          color: #e74c3c;
-      }
-      
-      #category-spend-container {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          width: 100%;
-      }
-      
-      .no-data-message {
-          text-align: center;
-          color: #666;
-          margin: 20px 0;
-          font-style: italic;
-      }
-      
-      /* Section header styling */
-      .spend-section-header {
-          text-align: center;
-          margin-bottom: 20px;
-          width: 100%;
-      }
-
-      .spend-section-header h3 {
-          font-size: 22px;
-          color: #333;
-          margin-bottom: 5px;
-      }
-
-      .section-subtitle {
-          color: #666;
-          font-size: 14px;
-          margin-top: 0;
-      }
-
-      /* Container for spend circles */
-      .spend-circles-container {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          width: 100%;
-          gap: 15px;
-      }
-
-      /* Spend Item Styling - Transaction Style with Progress Circle */
-      .spend-item {
-          margin: 15px 0;
-          width: 100%;
-          max-width: 600px;
-      }
-
-      .spend-item-container {
-          display: flex;
-          align-items: center;
-          padding: 15px;
-          background-color: #fff;
-          border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .spend-item-container:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-      }
-
-      .spend-circle-container {
-          position: relative;
-          width: 90px;
-          height: 90px;
-          flex-shrink: 0;
-          margin-right: 15px;
-      }
-
-      .category-emoji-background {
-          position: absolute;
-          font-size: 30px;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 1;
-          opacity: 0.2;
-      }
-
-      .progress-ring {
-          position: absolute;
-          z-index: 2;
-      }
-
-      .progress-text {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 3;
-          text-align: center;
-          font-weight: bold;
-      }
-
-      .progress-text .percentage {
-          font-size: 18px;
-          font-weight: bold;
-          color: #333;
-      }
-
-      .spend-details {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-      }
-
-      .spend-category {
-          font-size: 18px;
-          font-weight: 600;
-          color: #333;
-      }
-
-      .spend-progress {
-          width: 100%;
-          height: 10px;
-          margin: 5px 0;
-      }
-
-      .progress-bar {
-          width: 100%;
-          height: 8px;
-          background-color: #f0f0f0;
-          border-radius: 4px;
-          overflow: hidden;
-      }
-
-      .progress-fill {
-          height: 100%;
-          border-radius: 4px;
-          transition: width 0.3s ease;
-      }
-
-      .progress-fill.good {
-          background-color: #2ecc71;
-      }
-
-      .progress-fill.warning {
-          background-color: #f39c12;
-      }
-
-      .progress-fill.danger {
-          background-color: #e74c3c;
-      }
-
-      .spend-amounts {
-          display: flex;
-          align-items: center;
-          font-size: 14px;
-          color: #666;
-      }
-
-      .spent-amount {
-          font-weight: 600;
-          color: #333;
-      }
-
-      .budget-divider {
-          margin: 0 5px;
-      }
-
-      .budget-amount {
-          font-weight: 600;
-          color: #333;
-      }
-
-      .spend-item-container.good {
-          border-left: 4px solid #2ecc71;
-      }
-
-      .spend-item-container.warning {
-          border-left: 4px solid #f39c12;
-      }
-
-      .spend-item-container.danger {
-          border-left: 4px solid #e74c3c;
-      }
-
-      /* Category List Styling (Transaction-like) */
-      .categories-list {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-      }
-
-      .category-item {
-          width: 100%;
-      }
-
-      .category-item-container {
-          display: flex;
-          align-items: center;
-          padding: 15px;
-          background-color: #fff;
-          border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          transition: all 0.2s ease;
-          border-left: 4px solid #3498db;
-      }
-
-      .category-item-container:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-      }
-
-      .category-icon {
-          font-size: 24px;
-          margin-right: 15px;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #f8f9fa;
-          border-radius: 50%;
-      }
-
-      .category-details {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-      }
-
-      .category-name {
-          font-size: 16px;
-          font-weight: 600;
-          color: #333;
-      }
-
-      .category-stats {
-          font-size: 14px;
-          color: #666;
-      }
-
-      .category-amount {
-          font-weight: 600;
-          font-size: 16px;
-          color: #e74c3c;
-      }
-
-      /* Improved Progress Circle Styling */
-      .progress-ring-circle {
-          transition: stroke-dashoffset 0.35s;
-          transform: rotate(-90deg);
-          transform-origin: 50% 50%;
-      }
-
-      .progress-ring-circle.good {
-          stroke: #2ecc71;
-      }
-
-      .progress-ring-circle.warning {
-          stroke: #f39c12;
-      }
-
-      .progress-ring-circle.danger {
-          stroke: #e74c3c;
-      }
-
-      .progress-text {
-          font-size: 16px;
-          font-weight: bold;
-          color: #333;
-      }
-
-      /* Minimal Green Spend Circles */
-      .spend-circles-minimal {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-      }
-
-      .spend-item-minimal {
-          background-color: #75b678;  /* Light green background */
-          border-radius: 8px;
-          padding: 15px;
-          display: flex;
-          align-items: center;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .spend-circle-minimal {
-          position: relative;
-          width: 70px;
-          height: 70px;
-          margin-right: 15px;
-          flex-shrink: 0;
-      }
-
-      .progress-ring-minimal {
-          position: absolute;
-          top: 0;
-          left: 0;
-      }
-
-      .progress-text-minimal {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          color: white;
-          font-weight: bold;
-          font-size: 14px;
-      }
-
-      .spend-details-minimal {
-          flex: 1;
-      }
-
-      .category-header {
-          display: flex;
-          align-items: center;
-          margin-bottom: 5px;
-      }
-
-      .category-emoji {
-          margin-right: 8px;
-          font-size: 18px;
-      }
-
-      .category-name {
-          font-size: 16px;
-          font-weight: 600;
-          color: white;
-      }
-
-      .spend-amount {
-          font-size: 14px;
-          color: rgba(255, 255, 255, 0.9);
-          margin-bottom: 4px;
-      }
-
-      .spend-status {
-          font-size: 13px;
-          color: rgba(255, 255, 255, 0.8);
-          font-weight: 400;
-      }
-
-      /* Adjust container background */
-      .category-box.bottom-left .box-content,
-      .category-box.bottom-left .box-title,
-      .category-box.bottom-left .timeframe-controls,
-      .category-box.bottom-left .time-btn,
-      .category-box.bottom-left .time-btn:hover,
-      .category-box.bottom-left .time-btn.active,
-      .category-box.bottom-left .no-data-message {
-          /* These styles will now be handled by the main CSS file */
-          background-color: inherit;
-          color: inherit;
-          border-radius: inherit;
-          padding: inherit;
-          margin: inherit;
-          font-weight: inherit;
-      }
-
-      /* Enhanced Active Categories styling */
-      .category-stats {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          font-size: 12px;
-          color: #777;
-      }
-
-      .withdrawal-stat, .deposit-stat {
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-size: 11px;
-      }
-
-      .withdrawal-stat {
-          background-color: rgba(231, 76, 60, 0.1);
-          color: #e74c3c;
-      }
-
-      .deposit-stat {
-          background-color: rgba(46, 204, 113, 0.1);
-          color: #2ecc71;
-      }
-
-      .category-amounts {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 2px;
-      }
-
-      .withdrawal-amount {
-          color: #e74c3c;
-          font-size: 14px;
-      }
-
-      .deposit-amount {
-          color: #2ecc71;
-          font-size: 14px;
-      }
-
-      .net-amount {
-          font-weight: 600;
-          font-size: 15px;
-          margin-top: 3px;
-          padding: 2px 6px;
-          border-radius: 4px;
-      }
-
-      .net-amount.positive {
-          color: #2ecc71;
-          background-color: rgba(46, 204, 113, 0.1);
-      }
-
-      .net-amount.negative {
-          color: #e74c3c;
-          background-color: rgba(231, 76, 60, 0.1);
-      }
-
-      .modal-description {
-          color: #666;
-          font-size: 14px;
-          margin-bottom: 20px;
-          line-height: 1.4;
+        color: #e74c3c;
       }
     </style>
   </head>
@@ -565,7 +74,7 @@
     </header>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <nav class="sidebar">
       <ul class="sidebar-menu">
         <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="../resource/transaction.html">Transactions</a></li>
@@ -577,96 +86,107 @@
         </li>
         <li><a href="../resource/faq.html">FAQ</a></li>
       </ul>
-    </div>
+    </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <main class="main-content">
       <!-- Top Section -->
-      <div class="top-section">
-        <div class="category-box top-left">
+      <section class="top-section">
+        <div class="category-box">
           <div class="box-content">
             <h2 class="box-title">Category Budget</h2>
             <div id="category-budget-container" class="content-container">
-              <!-- Budgets will be displayed here -->
-              <p class="no-data-message">No budgets set. Use the button below to set your first category budget.</p>
+              <p class="no-data-message">
+                No budgets set. Use the button below to set your first category
+                budget.
+              </p>
             </div>
-            <button id="set-budget-btn" class="action-button">Set Budget</button>
+            <button id="set-budget-btn" class="action-button">
+              Set Budget
+            </button>
           </div>
         </div>
-        <div class="category-box top-right">
+
+        <div class="category-box">
           <div class="box-content">
             <h2 class="box-title">Top Categories</h2>
-            <div id="category-rankings" class="content-container">
-              <!-- Top categories will be displayed here -->
-            </div>
+            <div id="category-rankings" class="content-container"></div>
             <div class="timeframe-controls">
-              <button class="time-btn active" data-timeframe="day">Today</button>
+              <button class="time-btn active" data-timeframe="day">
+                Today
+              </button>
               <button class="time-btn" data-timeframe="week">This Week</button>
-              <button class="time-btn" data-timeframe="month">This Month</button>
+              <button class="time-btn" data-timeframe="month">
+                This Month
+              </button>
               <button class="time-btn" data-timeframe="3m">3 Months</button>
               <button class="time-btn" data-timeframe="ytd">YTD</button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Bottom Section -->
-      <div class="bottom-section">
-        <div class="category-box bottom-left">
+      <section class="bottom-section">
+        <div class="category-box">
           <div class="box-content">
             <h2 class="box-title">Current Spend</h2>
-            <div class="timeframe-controls">
-              <button class="time-btn" data-timeframe="day">Today</button>
-              <button class="time-btn" data-timeframe="week">This Week</button>
-              <button class="time-btn active" data-timeframe="month">This Month</button>
-              <button class="time-btn" data-timeframe="3m">3 Months</button>
-              <button class="time-btn" data-timeframe="ytd">YTD</button>
-            </div>
             <div id="category-spend-container" class="content-container">
-              <!-- Current spend with progress circles will be displayed here -->
               <p class="no-data-message">No category spend data available.</p>
             </div>
           </div>
         </div>
-        <div class="category-box bottom-right">
+
+        <div class="category-box">
           <div class="box-content">
             <h2 class="box-title">Active Categories</h2>
-            <div id="active-categories-container" class="content-container">
-              <!-- Active categories will be displayed here -->
-            </div>
+            <div
+              id="active-categories-container"
+              class="content-container"
+            ></div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <!-- Modal for setting category budget -->
     <div id="budget-modal" class="modal">
       <div class="modal-content">
         <span class="close-modal">&times;</span>
         <h2>Set Monthly Budget</h2>
-        <p class="modal-description">Set a monthly spending limit for this category. Your spending will be tracked monthly.</p>
+        <p class="modal-description">
+          Set a monthly spending limit for this category. Your spending will be
+          tracked monthly.
+        </p>
         <form id="budget-form">
           <div class="form-group">
             <label for="category-select">Category</label>
             <select id="category-select" required>
-              <!-- Categories will be populated here -->
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
               <option value="Custom">➕ Add Custom Category</option>
             </select>
           </div>
-          
-          <!-- Custom category input fields -->
           <div id="custom-category-group" class="form-group hidden">
-            <div class="custom-category-inputs">
-              <label for="custom-category-name">Category Name</label>
-              <input type="text" id="custom-category-name" placeholder="Category Name">
-              <label for="custom-emoji">Emoji</label>
-              <input type="text" id="custom-emoji" placeholder="Enter Emoji">
-            </div>
+            <label for="custom-category-name">Category Name</label>
+            <input
+              type="text"
+              id="custom-category-name"
+              placeholder="Enter Category Name"
+            />
+            <label for="custom-emoji">Emoji</label>
+            <input type="text" id="custom-emoji" placeholder="Enter Emoji" />
           </div>
-          
           <div class="form-group">
             <label for="budget-amount">Monthly Budget</label>
-            <input type="number" id="budget-amount" min="1" step="0.01" required placeholder="Enter amount">
+            <input
+              type="number"
+              id="budget-amount"
+              min="1"
+              step="0.01"
+              required
+              placeholder="Enter amount"
+            />
           </div>
           <button type="submit" class="submit-btn">Save Budget</button>
         </form>
@@ -677,6 +197,32 @@
     <div id="toast" class="toast"></div>
 
     <!-- Scripts -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const setBudgetBtn = document.getElementById("set-budget-btn");
+        const budgetModal = document.getElementById("budget-modal");
+        const closeModal = document.querySelector(".close-modal");
+
+        if (setBudgetBtn) {
+          setBudgetBtn.addEventListener("click", function () {
+            budgetModal.style.display = "block"; // Open modal
+          });
+        }
+
+        if (closeModal) {
+          closeModal.addEventListener("click", function () {
+            budgetModal.style.display = "none"; // Close modal
+          });
+        }
+
+        // Close modal if user clicks outside it
+        window.addEventListener("click", function (event) {
+          if (event.target === budgetModal) {
+            budgetModal.style.display = "none";
+          }
+        });
+      });
+    </script>
     <script src="../js/api.js"></script>
     <script src="../js/common.js"></script>
     <script src="../js/auth.js"></script>

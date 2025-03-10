@@ -1,486 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vaultly - Frequently Asked Questions</title>
-    <link rel="stylesheet" href="../style/dashboard.css">
+    <link rel="stylesheet" href="../style/dashboard.css" />
     <style>
-        /* FAQ Page Specific Styles */
-        .faq-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .search-container {
-            margin-bottom: 30px;
-            position: relative;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 30px;
-            outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        
-        .search-input:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-        }
-        
-        .search-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            font-size: 20px;
-        }
-        
-        .faq-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .faq-item {
-            margin-bottom: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: box-shadow 0.3s;
-        }
-        
-        .faq-item:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .faq-question {
-            background-color: #f8f9fa;
-            padding: 15px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-        
-        .faq-question:hover {
-            background-color: #f0f0f0;
-        }
-        
-        .faq-question:after {
-            content: '+';
-            font-size: 20px;
-            color: #555;
-            transition: transform 0.3s;
-        }
-        
-        .faq-item.active .faq-question:after {
-            content: '−';
-        }
-        
-        .faq-answer {
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            background-color: white;
-            transition: max-height 0.5s ease, padding 0.3s ease;
-        }
-        
-        .faq-item.active .faq-answer {
-            padding: 15px 20px;
-            max-height: 500px;
-        }
-        
-        .faq-answer p {
-            margin: 0 0 10px;
-            line-height: 1.6;
-        }
-        
-        .faq-item.active {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .faq-categories {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .category-btn {
-            padding: 8px 15px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        .category-btn:hover {
-            background-color: #e0e0e0;
-        }
-        
-        .category-btn.active {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #666;
-        }
-        
-        .highlighted {
-            background-color: #ffff99;
-            padding: 0 2px;
-            border-radius: 2px;
-        }
-        
-        .page-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-        }
+      /* FAQ Page Specific Styles */
+      .faq-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .search-container {
+        margin-bottom: 30px;
+        position: relative;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 30px;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      .search-input:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 20px;
+      }
+
+      .faq-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .faq-item {
+        margin-bottom: 15px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s;
+      }
+
+      .faq-item:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .faq-question {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s;
+      }
+
+      .faq-question:hover {
+        background-color: #f0f0f0;
+      }
+
+      .faq-question:after {
+        content: "+";
+        font-size: 20px;
+        color: #555;
+        transition: transform 0.3s;
+      }
+
+      .faq-item.active .faq-question:after {
+        content: "−";
+      }
+
+      .faq-answer {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        background-color: white;
+        transition: max-height 0.5s ease, padding 0.3s ease;
+      }
+
+      .faq-item.active .faq-answer {
+        padding: 15px 20px;
+        max-height: 500px;
+      }
+
+      .faq-answer p {
+        margin: 0 0 10px;
+        line-height: 1.6;
+      }
+
+      .faq-item.active {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .faq-categories {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .category-btn {
+        padding: 8px 15px;
+        background-color: #f0f0f0;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .category-btn:hover {
+        background-color: #e0e0e0;
+      }
+
+      .category-btn.active {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: #666;
+      }
+
+      .highlighted {
+        background-color: #ffff99;
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+
+      .page-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Header -->
     <header class="header">
-        <div class="title-container">
-            <img class="logo" src="../images/2237920.png" alt="Vaultly Logo">
-            <h1 class="title">Vaultly</h1>
-        </div>
-        <button class="signout-btn">Sign Out</button>
+      <div class="title-container">
+        <img class="logo" src="../images/2237920.png" alt="Vaultly Logo" />
+        <h1 class="title">Vaultly</h1>
+      </div>
+      <button class="signout-btn">Sign Out</button>
     </header>
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="transaction.html">Transactions</a></li>
-            <li><a href="summaries.html">Available Summaries</a></li>
-            <li><a href="goals.html">Goals</a></li>
-            <li><a href="Rpurchases.html">Reoccurring Purchases</a></li>
-            <li><a href="Categories.html">Categories</a></li>
-            <li><a href="faq.html" class="active">FAQ</a></li>
-        </ul>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="transaction.html">Transactions</a></li>
+        <li><a href="summaries.html">Available Summaries</a></li>
+        <li><a href="goals.html">Goals</a></li>
+        <li><a href="Rpurchases.html">Reoccurring Purchases</a></li>
+        <li><a href="Categories.html">Categories</a></li>
+        <li><a href="faq.html" class="active">FAQ</a></li>
+      </ul>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="faq-container">
-            <h1 class="page-title">Frequently Asked Questions</h1>
-            
-            <!-- Search Bar -->
-            <div class="search-container">
-                <input type="text" id="faq-search" class="search-input" placeholder="Search for questions...">
-                <span class="search-icon">🔍</span>
-            </div>
-            
-            <!-- Category Filters -->
-            <div class="faq-categories">
-                <button class="category-btn active" data-category="all">All</button>
-                <button class="category-btn" data-category="account">Account</button>
-                <button class="category-btn" data-category="transactions">Transactions</button>
-                <button class="category-btn" data-category="goals">Goals</button>
-                <button class="category-btn" data-category="categories">Categories</button>
-                <button class="category-btn" data-category="recurring">Recurring Payments</button>
-            </div>
-            
-            <!-- FAQ Items -->
-            <ul class="faq-list" id="faq-list">
-                <!-- Account FAQs -->
-                <li class="faq-item" data-category="account">
-                    <div class="faq-question">How do I create an account?</div>
-                    <div class="faq-answer">
-                        <p>To create an account, click on the "Sign Up" button on the login page. You'll need to provide your email address and create a password. After submitting, you'll receive a confirmation email with instructions to activate your account.</p>
-                    </div>
-                </li>
-                
-                <li class="faq-item" data-category="account">
-                    <div class="faq-question">How can I reset my password?</div>
-                    <div class="faq-answer">
-                        <p>If you've forgotten your password, click on the "Forgot Password" link on the login page. Enter your email address, and we'll send you instructions to reset your password. For security reasons, the reset link is only valid for 24 hours.</p>
-                    </div>
-                </li>
-                
-                <!-- Transactions FAQs -->
-                <li class="faq-item" data-category="transactions">
-                    <div class="faq-question">How do I add a new transaction?</div>
-                    <div class="faq-answer">
-                        <p>To add a new transaction, go to the Transactions page and click the "Add Transaction" button. Fill in the required details such as amount, category, date, and type (income or expense). You can also add a description for better record-keeping.</p>
-                    </div>
-                </li>
-                
-                <li class="faq-item" data-category="transactions">
-                    <div class="faq-question">Can I edit or delete a transaction?</div>
-                    <div class="faq-answer">
-                        <p>Yes, you can edit or delete any transaction you've created. On the Transactions page, find the transaction you want to modify, then click the edit (pencil) or delete (trash) icon. When editing, you can change any details of the transaction.</p>
-                    </div>
-                </li>
-                
-                <!-- Goals FAQs -->
-                <li class="faq-item" data-category="goals">
-                    <div class="faq-question">How do I create a savings goal?</div>
-                    <div class="faq-answer">
-                        <p>To create a savings goal, navigate to the Goals page and click "Add New Goal." Enter a title, target amount, and optional category. You can also set a target date to help you plan your savings schedule.</p>
-                    </div>
-                </li>
-                
-                <li class="faq-item" data-category="goals">
-                    <div class="faq-question">What happens when I delete a goal?</div>
-                    <div class="faq-answer">
-                        <p>When you delete a goal, any funds you've allocated to that goal will be returned to your account balance. A transaction record will be created showing this refund. Any recurring deposits set up for the goal will also be deleted.</p>
-                    </div>
-                </li>
-                
-                <!-- Categories FAQs -->
-                <li class="faq-item" data-category="categories">
-                    <div class="faq-question">How do I create a new category?</div>
-                    <div class="faq-answer">
-                        <p>To create a new category, go to the Categories page and click "Add Category." Enter a name for your category and select an emoji to represent it. You can also set a budget for the category to help track your spending.</p>
-                    </div>
-                </li>
-                
-                <li class="faq-item" data-category="categories">
-                    <div class="faq-question">How do category budgets work?</div>
-                    <div class="faq-answer">
-                        <p>Category budgets allow you to set spending limits for different categories. On the Categories page, click "Set Budget" and select a category and monthly budget amount. The system will track your spending in each category and show you how much of your budget you've used.</p>
-                    </div>
-                </li>
-                
-                <!-- Recurring Payments FAQs -->
-                <li class="faq-item" data-category="recurring">
-                    <div class="faq-question">How do I set up recurring payments?</div>
-                    <div class="faq-answer">
-                        <p>To set up recurring payments, go to the Recurring Purchases page and click "Add Recurring Payment." Enter the payment details including amount, frequency (weekly, monthly, etc.), and description. You can also set up recurring deposits for your goals on the Goals page.</p>
-                    </div>
-                </li>
-                
-                <li class="faq-item" data-category="recurring">
-                    <div class="faq-question">Can I edit or delete recurring payments?</div>
-                    <div class="faq-answer">
-                        <p>Yes, you can edit or delete recurring payments at any time. On the Recurring Purchases page, find the payment you want to modify and click the edit or delete icon. Changes will apply to future payments only.</p>
-                    </div>
-                </li>
+      <div class="faq-container">
+        <h1 class="page-title">Frequently Asked Questions</h1>
 
-                <!-- Additional Account FAQs -->
-                <li class="faq-item" data-category="account">
-                    <div class="faq-question">How do I change my profile information?</div>
-                    <div class="faq-answer">
-                        <p>To update your profile information, go to the Account Settings page by clicking on your profile icon in the top-right corner. From there, you can edit your name, email address, and other personal details. Don't forget to click "Save Changes" when you're done.</p>
-                    </div>
-                </li>
-
-                <li class="faq-item" data-category="account">
-                    <div class="faq-question">Is my financial data secure?</div>
-                    <div class="faq-answer">
-                        <p>Absolutely! We take your security very seriously. All data is encrypted both in transit and at rest using industry-standard encryption protocols. We never share your financial information with third parties without your explicit consent.</p>
-                        <p>Additionally, we implement strict access controls and regular security audits to ensure your data remains protected at all times.</p>
-                    </div>
-                </li>
-
-                <li class="faq-item" data-category="account">
-                    <div class="faq-question">Can I export my financial data?</div>
-                    <div class="faq-answer">
-                        <p>Yes, you can export your financial data at any time. Go to the Summaries page and click on the "Export Data" button. You can choose to export in various formats including CSV, PDF, or Excel. This feature is useful for tax preparation or if you want to analyze your data in external tools.</p>
-                    </div>
-                </li>
-
-                <!-- Additional Transactions FAQs -->
-                <li class="faq-item" data-category="transactions">
-                    <div class="faq-question">How do I filter transactions?</div>
-                    <div class="faq-answer">
-                        <p>On the Transactions page, you'll find filter options at the top of the transaction list. You can filter by date range, category, transaction type (income or expense), and amount range. You can also use the search box to find specific transactions by description or other details.</p>
-                    </div>
-                </li>
-
-                <li class="faq-item" data-category="transactions">
-                    <div class="faq-question">Can I import transactions from my bank?</div>
-                    <div class="faq-answer">
-                        <p>Not yet, but we're working on it! In an upcoming update, we'll introduce the ability to securely connect to your bank accounts and automatically import transactions. This feature will save you time and ensure your financial data is always up to date.</p>
-                        <p>In the meantime, you can manually add transactions or import them using our CSV template.</p>
-                    </div>
-                </li>
-
-                <!-- Additional Goals FAQs -->
-                <li class="faq-item" data-category="goals">
-                    <div class="faq-question">How are recurring deposits to my goals processed?</div>
-                    <div class="faq-answer">
-                        <p>When you set up a recurring deposit for a goal, the system automatically transfers the specified amount from your balance to your goal at the scheduled interval (daily, weekly, monthly, etc.). Each deposit creates a transaction record and updates your goal's progress.</p>
-                        <p>You can view all scheduled deposits in the Recurring Payments section of your Dashboard.</p>
-                    </div>
-                </li>
-
-                <li class="faq-item" data-category="goals">
-                    <div class="faq-question">What happens when I reach my goal target?</div>
-                    <div class="faq-answer">
-                        <p>Congratulations! When you reach your goal target, you'll receive a notification celebrating your achievement. The goal will be marked as completed, and you'll have several options:</p>
-                        <p>1. Keep the goal active and continue adding funds (for example, if it's an ongoing savings goal).</p>
-                        <p>2. Create a new goal with the accumulated funds as a starting point.</p>
-                        <p>3. Return the funds to your main balance by deleting the goal.</p>
-                        <p>Any recurring deposits associated with the goal will continue unless you manually cancel them.</p>
-                    </div>
-                </li>
-
-                <!-- Additional Categories FAQs -->
-                <li class="faq-item" data-category="categories">
-                    <div class="faq-question">What are the default categories and can I customize them?</div>
-                    <div class="faq-answer">
-                        <p>Vaultly comes with several default categories like Food, Transportation, Housing, Entertainment, etc. You can definitely customize these!</p>
-                        <p>You can add your own custom categories with personalized names and emoji icons. On the Categories page, click "Add Category" and enter the details. You can also set budgets for both default and custom categories.</p>
-                    </div>
-                </li>
-
-                <li class="faq-item" data-category="categories">
-                    <div class="faq-question">How do I track spending in a specific category over time?</div>
-                    <div class="faq-answer">
-                        <p>The Categories page provides several ways to track your spending by category:</p>
-                        <p>1. The "Current Spend" section shows your spending against budget for each category in the current period.</p>
-                        <p>2. The "Top Categories" section ranks your most-used categories by spending amount or transaction count.</p>
-                        <p>3. For more detailed analysis, go to the Summaries page where you can generate reports showing category spending across custom date ranges.</p>
-                    </div>
-                </li>
-
-                <!-- Additional Recurring Payments FAQs -->
-                <li class="faq-item" data-category="recurring">
-                    <div class="faq-question">Will I get reminders before recurring payments?</div>
-                    <div class="faq-answer">
-                        <p>Yes! By default, you'll receive notifications 2 days before any scheduled recurring payment. You can customize these notification settings in your Account Preferences. These reminders help ensure you always have sufficient funds in your account for upcoming payments.</p>
-                    </div>
-                </li>
-
-                <li class="faq-item" data-category="recurring">
-                    <div class="faq-question">How do I see a history of past recurring payments?</div>
-                    <div class="faq-answer">
-                        <p>All processed recurring payments appear in your regular transaction history with a special "Recurring" label. You can filter your transactions to show only recurring payments by selecting the "Recurring" filter on the Transactions page.</p>
-                        <p>Additionally, on the Recurring Purchases page, each recurring payment item has a "View History" option that shows all past instances of that specific payment.</p>
-                    </div>
-                </li>
-            </ul>
+        <!-- Search Bar -->
+        <div class="search-container">
+          <input
+            type="text"
+            id="faq-search"
+            class="search-input"
+            placeholder="Search for questions..."
+          />
+          <span class="search-icon">🔍</span>
         </div>
+
+        <!-- Category Filters -->
+        <div class="faq-categories">
+          <button class="category-btn active" data-category="all">All</button>
+          <button class="category-btn" data-category="account">Account</button>
+          <button class="category-btn" data-category="transactions">
+            Transactions
+          </button>
+          <button class="category-btn" data-category="goals">Goals</button>
+          <button class="category-btn" data-category="categories">
+            Categories
+          </button>
+          <button class="category-btn" data-category="recurring">
+            Recurring Payments
+          </button>
+        </div>
+
+        <!-- FAQ Items -->
+        <ul class="faq-list" id="faq-list">
+          <!-- Account FAQs -->
+          <li class="faq-item" data-category="account">
+            <div class="faq-question">How do I create an account?</div>
+            <div class="faq-answer">
+              <p>
+                To create an account, click on the "Sign Up" button on the login
+                page. You'll need to provide your email address and create a
+                password. After submitting, you'll receive a confirmation email
+                with instructions to activate your account.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="account">
+            <div class="faq-question">How can I reset my password?</div>
+            <div class="faq-answer">
+              <p>
+                If you've forgotten your password, click on the "Forgot
+                Password" link on the login page. Enter your email address, and
+                we'll send you instructions to reset your password. For security
+                reasons, the reset link is only valid for 24 hours.
+              </p>
+            </div>
+          </li>
+
+          <!-- Transactions FAQs -->
+          <li class="faq-item" data-category="transactions">
+            <div class="faq-question">How do I add a new transaction?</div>
+            <div class="faq-answer">
+              <p>
+                To add a new transaction, go to the Transactions page and click
+                the "Add Transaction" button. Fill in the required details such
+                as amount, category, date, and type (income or expense). You can
+                also add a description for better record-keeping.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="transactions">
+            <div class="faq-question">Can I edit or delete a transaction?</div>
+            <div class="faq-answer">
+              <p>
+                Yes, you can edit or delete any transaction you've created. On
+                the Transactions page, find the transaction you want to modify,
+                then click the edit (pencil) or delete (trash) icon. When
+                editing, you can change any details of the transaction.
+              </p>
+            </div>
+          </li>
+
+          <!-- Goals FAQs -->
+          <li class="faq-item" data-category="goals">
+            <div class="faq-question">How do I create a savings goal?</div>
+            <div class="faq-answer">
+              <p>
+                To create a savings goal, navigate to the Goals page and click
+                "Add New Goal." Enter a title, target amount, and optional
+                category. You can also set a target date to help you plan your
+                savings schedule.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="goals">
+            <div class="faq-question">What happens when I delete a goal?</div>
+            <div class="faq-answer">
+              <p>
+                When you delete a goal, any funds you've allocated to that goal
+                will be returned to your account balance. A transaction record
+                will be created showing this refund. Any recurring deposits set
+                up for the goal will also be deleted.
+              </p>
+            </div>
+          </li>
+
+          <!-- Categories FAQs -->
+          <li class="faq-item" data-category="categories">
+            <div class="faq-question">How do I create a new category?</div>
+            <div class="faq-answer">
+              <p>
+                To create a new category, go to the Categories page and click
+                "Add Category." Enter a name for your category and select an
+                emoji to represent it. You can also set a budget for the
+                category to help track your spending.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="categories">
+            <div class="faq-question">How do category budgets work?</div>
+            <div class="faq-answer">
+              <p>
+                Category budgets allow you to set spending limits for different
+                categories. On the Categories page, click "Set Budget" and
+                select a category and monthly budget amount. The system will
+                track your spending in each category and show you how much of
+                your budget you've used.
+              </p>
+            </div>
+          </li>
+
+          <!-- Recurring Payments FAQs -->
+          <li class="faq-item" data-category="recurring">
+            <div class="faq-question">How do I set up recurring payments?</div>
+            <div class="faq-answer">
+              <p>
+                To set up recurring payments, go to the Recurring Purchases page
+                and click "Add Recurring Payment." Enter the payment details
+                including amount, frequency (weekly, monthly, etc.), and
+                description. You can also set up recurring deposits for your
+                goals on the Goals page.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="recurring">
+            <div class="faq-question">
+              Can I edit or delete recurring payments?
+            </div>
+            <div class="faq-answer">
+              <p>
+                Yes, you can edit or delete recurring payments at any time. On
+                the Recurring Purchases page, find the payment you want to
+                modify and click the edit or delete icon. Changes will apply to
+                future payments only.
+              </p>
+            </div>
+          </li>
+
+          <!-- Additional Account FAQs -->
+          <li class="faq-item" data-category="account">
+            <div class="faq-question">
+              How do I change my profile information?
+            </div>
+            <div class="faq-answer">
+              <p>
+                To update your profile information, go to the Account Settings
+                page by clicking on your profile icon in the top-right corner.
+                From there, you can edit your name, email address, and other
+                personal details. Don't forget to click "Save Changes" when
+                you're done.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="account">
+            <div class="faq-question">Is my financial data secure?</div>
+            <div class="faq-answer">
+              <p>
+                Absolutely! We take your security very seriously. All data is
+                encrypted both in transit and at rest using industry-standard
+                encryption protocols. We never share your financial information
+                with third parties without your explicit consent.
+              </p>
+              <p>
+                Additionally, we implement strict access controls and regular
+                security audits to ensure your data remains protected at all
+                times.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="account">
+            <div class="faq-question">Can I export my financial data?</div>
+            <div class="faq-answer">
+              <p>
+                Yes, you can export your financial data at any time. Go to the
+                Summaries page and click on the "Export Data" button. You can
+                choose to export in various formats including CSV, PDF, or
+                Excel. This feature is useful for tax preparation or if you want
+                to analyze your data in external tools.
+              </p>
+            </div>
+          </li>
+
+          <!-- Additional Transactions FAQs -->
+          <li class="faq-item" data-category="transactions">
+            <div class="faq-question">How do I filter transactions?</div>
+            <div class="faq-answer">
+              <p>
+                On the Transactions page, you'll find filter options at the top
+                of the transaction list. You can filter by date range, category,
+                transaction type (income or expense), and amount range. You can
+                also use the search box to find specific transactions by
+                description or other details.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="transactions">
+            <div class="faq-question">
+              Can I import transactions from my bank?
+            </div>
+            <div class="faq-answer">
+              <p>
+                Not yet, but we're working on it! In an upcoming update, we'll
+                introduce the ability to securely connect to your bank accounts
+                and automatically import transactions. This feature will save
+                you time and ensure your financial data is always up to date.
+              </p>
+              <p>
+                In the meantime, you can manually add transactions or import
+                them using our CSV template.
+              </p>
+            </div>
+          </li>
+
+          <!-- Additional Goals FAQs -->
+          <li class="faq-item" data-category="goals">
+            <div class="faq-question">
+              How are recurring deposits to my goals processed?
+            </div>
+            <div class="faq-answer">
+              <p>
+                When you set up a recurring deposit for a goal, the system
+                automatically transfers the specified amount from your balance
+                to your goal at the scheduled interval (daily, weekly, monthly,
+                etc.). Each deposit creates a transaction record and updates
+                your goal's progress.
+              </p>
+              <p>
+                You can view all scheduled deposits in the Recurring Payments
+                section of your Dashboard.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="goals">
+            <div class="faq-question">
+              What happens when I reach my goal target?
+            </div>
+            <div class="faq-answer">
+              <p>
+                Congratulations! When you reach your goal target, you'll receive
+                a notification celebrating your achievement. The goal will be
+                marked as completed, and you'll have several options:
+              </p>
+              <p>
+                1. Keep the goal active and continue adding funds (for example,
+                if it's an ongoing savings goal).
+              </p>
+              <p>
+                2. Create a new goal with the accumulated funds as a starting
+                point.
+              </p>
+              <p>
+                3. Return the funds to your main balance by deleting the goal.
+              </p>
+              <p>
+                Any recurring deposits associated with the goal will continue
+                unless you manually cancel them.
+              </p>
+            </div>
+          </li>
+
+          <!-- Additional Categories FAQs -->
+          <li class="faq-item" data-category="categories">
+            <div class="faq-question">
+              What are the default categories and can I customize them?
+            </div>
+            <div class="faq-answer">
+              <p>
+                Vaultly comes with several default categories like Food,
+                Transportation, Housing, Entertainment, etc. You can definitely
+                customize these!
+              </p>
+              <p>
+                You can add your own custom categories with personalized names
+                and emoji icons. On the Categories page, click "Add Category"
+                and enter the details. You can also set budgets for both default
+                and custom categories.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="categories">
+            <div class="faq-question">
+              How do I track spending in a specific category over time?
+            </div>
+            <div class="faq-answer">
+              <p>
+                The Categories page provides several ways to track your spending
+                by category:
+              </p>
+              <p>
+                1. The "Current Spend" section shows your spending against
+                budget for each category in the current period.
+              </p>
+              <p>
+                2. The "Top Categories" section ranks your most-used categories
+                by spending amount or transaction count.
+              </p>
+              <p>
+                3. For more detailed analysis, go to the Summaries page where
+                you can generate reports showing category spending across custom
+                date ranges.
+              </p>
+            </div>
+          </li>
+
+          <!-- Additional Recurring Payments FAQs -->
+          <li class="faq-item" data-category="recurring">
+            <div class="faq-question">
+              Will I get reminders before recurring payments?
+            </div>
+            <div class="faq-answer">
+              <p>
+                Yes! By default, you'll receive notifications 2 days before any
+                scheduled recurring payment. You can customize these
+                notification settings in your Account Preferences. These
+                reminders help ensure you always have sufficient funds in your
+                account for upcoming payments.
+              </p>
+            </div>
+          </li>
+
+          <li class="faq-item" data-category="recurring">
+            <div class="faq-question">
+              How do I see a history of past recurring payments?
+            </div>
+            <div class="faq-answer">
+              <p>
+                All processed recurring payments appear in your regular
+                transaction history with a special "Recurring" label. You can
+                filter your transactions to show only recurring payments by
+                selecting the "Recurring" filter on the Transactions page.
+              </p>
+              <p>
+                Additionally, on the Recurring Purchases page, each recurring
+                payment item has a "View History" option that shows all past
+                instances of that specific payment.
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get elements
-            const searchInput = document.getElementById('faq-search');
-            const faqList = document.getElementById('faq-list');
-            const faqItems = document.querySelectorAll('.faq-item');
-            const categoryButtons = document.querySelectorAll('.category-btn');
-            
-            // Initialize active category
-            let activeCategory = 'all';
-            
-            // Toggle FAQ answer visibility
-            faqList.addEventListener('click', function(e) {
-                const question = e.target.closest('.faq-question');
-                if (question) {
-                    const item = question.parentElement;
-                    item.classList.toggle('active');
-                }
-            });
-            
-            // Filter by category
-            categoryButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Update active button
-                    categoryButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Set active category
-                    activeCategory = this.dataset.category;
-                    
-                    // Filter items
-                    filterItems();
-                });
-            });
-            
-            // Search functionality
-            searchInput.addEventListener('input', filterItems);
-            
-            // Function to filter items based on search and category
-            function filterItems() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let visibleCount = 0;
-                
-                faqItems.forEach(item => {
-                    const question = item.querySelector('.faq-question').textContent.toLowerCase();
-                    const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
-                    const category = item.dataset.category;
-                    
-                    // Check if matches search term and category
-                    const matchesSearch = searchTerm === '' || 
-                                         question.includes(searchTerm) || 
-                                         answer.includes(searchTerm);
-                    const matchesCategory = activeCategory === 'all' || category === activeCategory;
-                    
-                    // Show/hide based on matches
-                    if (matchesSearch && matchesCategory) {
-                        item.style.display = '';
-                        visibleCount++;
-                        
-                        // Highlight search term if any
-                        highlightSearchTerm(item, searchTerm);
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-                
-                // Show "no results" message if needed
-                let noResults = document.querySelector('.no-results');
-                if (visibleCount === 0) {
-                    if (!noResults) {
-                        noResults = document.createElement('div');
-                        noResults.className = 'no-results';
-                        noResults.textContent = 'No matching questions found.';
-                        faqList.appendChild(noResults);
-                    }
-                } else if (noResults) {
-                    noResults.remove();
-                }
-            }
-            
-            // Function to highlight search terms
-            function highlightSearchTerm(item, searchTerm) {
-                if (!searchTerm) {
-                    // Remove any existing highlights
-                    const highlighted = item.querySelectorAll('.highlighted');
-                    highlighted.forEach(el => {
-                        el.outerHTML = el.textContent;
-                    });
-                    return;
-                }
-                
-                // Get text elements
-                const question = item.querySelector('.faq-question');
-                const answer = item.querySelector('.faq-answer');
-                
-                // Highlight in question
-                question.innerHTML = question.textContent.replace(
-                    new RegExp(searchTerm, 'gi'),
-                    match => `<span class="highlighted">${match}</span>`
-                );
-                
-                // Highlight in answer
-                const paragraphs = answer.querySelectorAll('p');
-                paragraphs.forEach(p => {
-                    p.innerHTML = p.textContent.replace(
-                        new RegExp(searchTerm, 'gi'),
-                        match => `<span class="highlighted">${match}</span>`
-                    );
-                });
-            }
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get elements
+        const searchInput = document.getElementById("faq-search");
+        const faqList = document.getElementById("faq-list");
+        const faqItems = document.querySelectorAll(".faq-item");
+        const categoryButtons = document.querySelectorAll(".category-btn");
+
+        // Initialize active category
+        let activeCategory = "all";
+
+        // Toggle FAQ answer visibility
+        faqList.addEventListener("click", function (e) {
+          const question = e.target.closest(".faq-question");
+          if (question) {
+            const item = question.parentElement;
+            item.classList.toggle("active");
+          }
         });
+
+        // Filter by category
+        categoryButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // Update active button
+            categoryButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            // Set active category
+            activeCategory = this.dataset.category;
+
+            // Filter items
+            filterItems();
+          });
+        });
+
+        // Search functionality
+        searchInput.addEventListener("input", filterItems);
+
+        // Function to filter items based on search and category
+        function filterItems() {
+          const searchTerm = searchInput.value.toLowerCase();
+          let visibleCount = 0;
+
+          faqItems.forEach((item) => {
+            const question = item
+              .querySelector(".faq-question")
+              .textContent.toLowerCase();
+            const answer = item
+              .querySelector(".faq-answer")
+              .textContent.toLowerCase();
+            const category = item.dataset.category;
+
+            // Check if matches search term and category
+            const matchesSearch =
+              searchTerm === "" ||
+              question.includes(searchTerm) ||
+              answer.includes(searchTerm);
+            const matchesCategory =
+              activeCategory === "all" || category === activeCategory;
+
+            // Show/hide based on matches
+            if (matchesSearch && matchesCategory) {
+              item.style.display = "";
+              visibleCount++;
+
+              // Highlight search term if any
+              highlightSearchTerm(item, searchTerm);
+            } else {
+              item.style.display = "none";
+            }
+          });
+
+          // Show "no results" message if needed
+          let noResults = document.querySelector(".no-results");
+          if (visibleCount === 0) {
+            if (!noResults) {
+              noResults = document.createElement("div");
+              noResults.className = "no-results";
+              noResults.textContent = "No matching questions found.";
+              faqList.appendChild(noResults);
+            }
+          } else if (noResults) {
+            noResults.remove();
+          }
+        }
+
+        // Function to highlight search terms
+        function highlightSearchTerm(item, searchTerm) {
+          if (!searchTerm) {
+            // Remove any existing highlights
+            const highlighted = item.querySelectorAll(".highlighted");
+            highlighted.forEach((el) => {
+              el.outerHTML = el.textContent;
+            });
+            return;
+          }
+
+          // Get text elements
+          const question = item.querySelector(".faq-question");
+          const answer = item.querySelector(".faq-answer");
+
+          // Highlight in question
+          question.innerHTML = question.textContent.replace(
+            new RegExp(searchTerm, "gi"),
+            (match) => `<span class="highlighted">${match}</span>`
+          );
+
+          // Highlight in answer
+          const paragraphs = answer.querySelectorAll("p");
+          paragraphs.forEach((p) => {
+            p.innerHTML = p.textContent.replace(
+              new RegExp(searchTerm, "gi"),
+              (match) => `<span class="highlighted">${match}</span>`
+            );
+          });
+        }
+      });
     </script>
-</body>
-</html> 
+  </body>
+</html>
