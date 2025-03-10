@@ -7,10 +7,27 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Add input event listener for confirm password
-    const confirmPasswordInput = document.getElementById("confirm-password");
+    // Form element references
+    const fullNameInput = document.getElementById("first-name"); // Note the ID is first-name, not full-name
+    const emailInput = document.getElementById("email-address");
     const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirm-password");
 
+    // Add input validation for email
+    if (emailInput) {
+        emailInput.addEventListener('input', () => {
+            validateEmail(emailInput.value);
+        });
+    }
+
+    // Add input validation for password
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            validatePassword(passwordInput.value);
+        });
+    }
+
+    // Add input event listener for confirm password
     if (confirmPasswordInput && passwordInput) {
         confirmPasswordInput.addEventListener('input', () => {
             const confirmPassword = confirmPasswordInput.value;
@@ -32,34 +49,27 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         resetErrors();
 
-        // Get form elements with correct IDs
-        const usernameInput = document.getElementById("full-name");
-        const emailInput = document.getElementById("email-address");
-        const passwordInput = document.getElementById("password");
-        const confirmPasswordInput = document.getElementById("confirm-password");
-
         // Check if elements exist
-        if (!usernameInput || !emailInput || !passwordInput || !confirmPasswordInput) {
+        if (!fullNameInput || !emailInput || !passwordInput || !confirmPasswordInput) {
             console.error("Required form fields not found!");
             return;
         }
 
         const formData = {
-            username: usernameInput.value.trim(),
+            username: fullNameInput.value.trim(),
             email: emailInput.value.trim(),
             password: passwordInput.value,
             confirmPassword: confirmPasswordInput.value
         };
 
-        // Validate passwords match
-        if (formData.password !== formData.confirmPassword) {
-            showError("password", "Passwords do not match");
-            return;
-        }
+        // Run all validations
+        const isFullNameValid = validateFullName(formData.username);
+        const isEmailValid = validateEmail(formData.email);
+        const isPasswordValid = validatePassword(formData.password);
+        const doPasswordsMatch = validatePasswordsMatch(formData.password, formData.confirmPassword);
 
-        // Validate all fields are filled
-        if (!formData.username || !formData.email || !formData.password) {
-            showError("signup", "All fields are required");
+        // If any validation fails, stop form submission
+        if (!isFullNameValid || !isEmailValid || !isPasswordValid || !doPasswordsMatch) {
             return;
         }
 
@@ -92,12 +102,73 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    function validateFullName(name) {
+        if (!name) {
+            showError("full-name", "Full name is required");
+            return false;
+        }
+        if (name.length < 2) {
+            showError("full-name", "Name must be at least 2 characters");
+            return false;
+        }
+        return true;
+    }
+
+    function validateEmail(email) {
+        if (!email) {
+            showError("email", "Email is required");
+            return false;
+        }
+        
+        // Basic email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError("email", "Please enter a valid email address");
+            return false;
+        }
+        
+        return true;
+    }
+
+    function validatePassword(password) {
+        if (!password) {
+            showError("password", "Password is required");
+            return false;
+        }
+        
+        if (password.length < 8) {
+            showError("password", "Password must be at least 8 characters");
+            return false;
+        }
+        
+        // Check for a strong password (at least one uppercase, one lowercase, one number)
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        
+        if (!(hasUppercase && hasLowercase && hasNumber)) {
+            showError("password", "Password must include uppercase, lowercase, and numbers");
+            return false;
+        }
+        
+        return true;
+    }
+
+    function validatePasswordsMatch(password, confirmPassword) {
+        if (password !== confirmPassword) {
+            showError("confirm-password", "Passwords do not match");
+            return false;
+        }
+        return true;
+    }
+
     function showError(field, message) {
         const errorElement = document.getElementById(`${field}-error`);
         if (errorElement) {
             errorElement.textContent = message;
             errorElement.classList.add('show');
         } else {
+            console.error(`Error element for ${field} not found`);
             alert(message); // Fallback if error element not found
         }
     }
