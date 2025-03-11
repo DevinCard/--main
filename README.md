@@ -45,9 +45,9 @@
 
 - Express.js
 
--bcrypt
+- bcrypt
 
--jsonwebtoken
+- jsonwebtoken
 
 ## Getting Started
 
